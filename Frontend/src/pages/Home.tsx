@@ -34,7 +34,7 @@ export default function Home() {
         Entity Framework Core is used to map the C# classes to SQL tables.
       </p>
       <p>
-        To add a new migration after a database change run the following command: <i>dotnet ef migrations add [[Migration name]]</i>
+        To add a new migration after a database change run the following command: <i>dotnet ef migrations add H  E  L  L  O</i>
       </p>
 
       <p>
