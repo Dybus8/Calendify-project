@@ -10,7 +10,7 @@ const Login: React.FC = () => {
         e.preventDefault();
         setMessage(null);
 
-        console.log("Attempting login with:", { username, password }); // Log the login attempt
+        console.log("Attempting login with:", { username, password });
 
         try {
             const response = await axios.post('http://localhost:5000/api/v1/Login/Login', {
@@ -23,7 +23,7 @@ const Login: React.FC = () => {
             if (response.status === 200) {
                 setMessage('Login successful');
                 // Redirect to another controller after successful login
-                window.location.href = 'http://localhost:5000/api/v1/Dashboard';
+                window.location.href = 'http://localhost:5000/api/v1/Home';
             }
         } catch (error) {
             console.log("Error response:", error); // Log the error response

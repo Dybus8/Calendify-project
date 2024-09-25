@@ -5,7 +5,7 @@ namespace StarterKit.Controllers
     [Route("api/v1/Login")]
     public class LoginController : Controller
     {
-        private static bool _isAdminLoggedIn = false; // Simulated login status
+        private static bool _isAdminLoggedIn = false;
 
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginBody loginBody)

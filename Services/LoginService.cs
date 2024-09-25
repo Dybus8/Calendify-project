@@ -10,16 +10,20 @@ public enum ADMIN_SESSION_KEY { adminLoggedIn }
 public class LoginService : ILoginService
 {
 
-    private readonly DatabaseContext _context;
+	private readonly DatabaseContext _context;
 
-    public LoginService(DatabaseContext context)
-    {
-        _context = context;
-    }
+	public LoginService(DatabaseContext context)
+	{
+		_context = context;
+	}
 
-    public LoginStatus CheckPassword(string username, string inputPassword)
-    {
-        // TODO: Make this method check the password with what is in the database
-        return LoginStatus.IncorrectPassword;
-    }
+	public LoginStatus CheckPassword(string username, string inputPassword)
+	{
+		// TODO: Make this method check the password with what is in the database
+		// foreach (var i in _context.Database.)
+		// {
+		// 	if ()
+		// }
+		return LoginStatus.IncorrectPassword;
+	}
 }
