@@ -20,10 +20,13 @@ public class LoginService : ILoginService
 	public LoginStatus CheckPassword(string username, string inputPassword)
 	{
 		// TODO: Make this method check the password with what is in the database
-		// foreach (var i in _context.Database.)
-		// {
-		// 	if ()
-		// }
+		foreach (var i in _context.Admin)
+		{
+			if (i.UserName == username)
+			{
+				
+			}
+		}
 		return LoginStatus.IncorrectPassword;
 	}
 }
