@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using StarterKit.Models;
 using StarterKit.Utils;
 
@@ -24,9 +25,17 @@ public class LoginService : ILoginService
 		{
 			if (i.UserName == username)
 			{
+				// Hash the entered password
+				string enteredPasswordHash = EncryptionHelper.HashPassword(inputPassword);
+				
+				// Compare the hashed entered password with the stored hash
+				if (enteredPasswordHash == i.Password){
+					return LoginStatus.Success;
+				}
+				return LoginStatus.IncorrectPassword;
 				
 			}
 		}
-		return LoginStatus.IncorrectPassword;
+		return LoginStatus.IncorrectUsername;
 	}
 }
