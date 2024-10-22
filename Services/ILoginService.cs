@@ -1,5 +1,11 @@
-namespace StarterKit.Services;
+using StarterKit.Models;
 
-public interface ILoginService {
-    public LoginStatus CheckPassword(string username, string inputPassword);
+namespace StarterKit.Services
+{
+	public interface ILoginService
+	{
+		LoginResult Login(string username, string password);
+		LoginStatus GetLoginStatus();
+		RegistrationResult Register(StarterKit.Models.RegisterModel model);
+	}
 }

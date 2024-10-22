@@ -1,51 +1,47 @@
 using Microsoft.AspNetCore.Mvc;
+using StarterKit.Models;
+using StarterKit.Services;
 
 namespace StarterKit.Controllers
 {
-    [Route("api/v1/Login")]
-    public class LoginController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LoginController : ControllerBase
     {
-        private static bool _isAdminLoggedIn = false;
+        private readonly ILoginService _loginService;
 
-        [HttpPost("Login")]
-        public IActionResult Login([FromBody] LoginBody loginBody)
+        public LoginController(ILoginService loginService)
         {
-            if (loginBody == null || string.IsNullOrEmpty(loginBody.Username) || string.IsNullOrEmpty(loginBody.Password))
-            {
-                return BadRequest("Username and password are required.");
-            }
-
-            if (loginBody.Username == "admin" && loginBody.Password == "password123")
-            {
-                _isAdminLoggedIn = true;
-                return Ok("Login successful");
-            }
-
-            return Unauthorized("Incorrect username or password");
+            _loginService = loginService;
         }
 
-        [HttpGet("IsAdminLoggedIn")]
-        public IActionResult IsAdminLoggedIn()
+        [HttpPost]
+        public IActionResult Login([FromBody] LoginModel model)
         {
-            if (_isAdminLoggedIn)
+            var result = _loginService.Login(model.Username, model.Password);
+            if (result.Success)
             {
-                return Ok("Admin is logged in");
+                return Ok(new { message = "Login successful", user = result.User });
             }
-
-            return Unauthorized("Admin is not logged in");
+            return Unauthorized(new { message = result.Message });
         }
 
-        [HttpGet("Logout")]
-        public IActionResult Logout()
+        [HttpGet("status")]
+        public IActionResult GetLoginStatus()
         {
-            _isAdminLoggedIn = false;
-            return Ok("Logged out");
+            var status = _loginService.GetLoginStatus();
+            return Ok(new { isLoggedIn = status.IsLoggedIn, username = status.Username });
         }
-    }
 
-    public class LoginBody
-    {
-        public string? Username { get; set; }
-        public string? Password { get; set; }
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] RegisterModel model)
+        {
+            var result = _loginService.Register(new RegisterModel { /* ... */ });
+            if (result.Success)
+            {
+                return Ok(new { message = "Registration successful" });
+            }
+            return BadRequest(new { message = result.Message });
+        }
     }
 }
