@@ -18,6 +18,13 @@ namespace StarterKit.Models
         public required List<Attendance> Attendances { get; set; }
 
         public required List<Event_Attendance> Event_Attendances { get; set; }
+        public string Username { get; internal set; }
+        public string Role { get; internal set; }
+
+        public static implicit operator User(User v)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class Attendance
@@ -27,6 +34,12 @@ namespace StarterKit.Models
         public DateTime AttendanceDate { get; set; }
 
         public required User User { get; set; }
+        public int EventId { get; internal set; }
+
+        public static implicit operator Attendance(Attendance v)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class Event_Attendance
@@ -46,7 +59,7 @@ namespace StarterKit.Models
 
         public required string Description { get; set; }
 
-        public DateOnly EventDate { get; set; }
+        public DateTime EventDate { get; set; }
 
         public TimeSpan StartTime { get; set; }
 
@@ -57,5 +70,7 @@ namespace StarterKit.Models
         public bool AdminApproval { get; set; }
 
         public required List<Event_Attendance> Event_Attendances { get; set; }
+        public object Reviews { get; internal set; }
+        public object Attendees { get; internal set; }
     }
 }

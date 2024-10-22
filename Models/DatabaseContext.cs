@@ -24,8 +24,7 @@ namespace StarterKit.Models
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Event_Attendance> Event_Attendance { get; set; }
         public DbSet<Event> Event { get; set; }
-
-
+        public object OfficeAttendances { get; internal set; }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
