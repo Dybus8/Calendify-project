@@ -2,7 +2,7 @@ using StarterKit.Models;
 
 namespace StarterKit.Services
 {
-	public class AttendanceService : IAttendanceService
+	public class AttendanceService
 	{
 		private readonly DatabaseContext _context;
 
@@ -30,9 +30,9 @@ namespace StarterKit.Services
 				return new AttendanceResult { Success = false, Message = "Event has already started or ended" };
 			}
 
-			var attendance = new Attendance
+			var attendance = new Attendance (model.UserId, model.EventId)
 			{
-				User = model.UserId,
+				UserId = model.UserId,
 				EventId = model.EventId
 			};
 
@@ -42,18 +42,18 @@ namespace StarterKit.Services
 			return new AttendanceResult { Success = true };
 		}
 
-		public List<User> GetAttendees(int eventId)
+		public List<int> GetAttendeesId(int eventId)
 		{
 			return _context.Attendance
 				.Where(a => a.EventId == eventId)
-				.Select(a => a.User)
+				.Select(a => a.UserId)
 				.ToList();
 		}
 
 		public AttendanceResult CancelAttendance(int eventId)
 		{
 			var attendance = _context.Attendance
-				.FirstOrDefault(a => a.EventId == eventId && a.User == int.Parse(HttpContext.Session.GetString("UserId")));
+				.FirstOrDefault(a => a.EventId == eventId);
 
 			if (attendance == null)
 			{

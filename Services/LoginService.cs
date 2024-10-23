@@ -52,7 +52,7 @@ namespace StarterKit.Services
 			var user = new User
 			{
 				Username = model.Username,
-				Password = HashPassword(model.Password),
+				Password = Convert.ToBase64String(HashPassword(model.Password)),
 				Email = model.Email,
 				Role = "User"
 			};
