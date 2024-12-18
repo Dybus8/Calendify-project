@@ -1,100 +1,140 @@
 using StarterKit.Models;
-using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography;
-using System.Text;
+using StarterKit.Models.DTOs;
+using StarterKit.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace StarterKit.Services
 {
-	public class LoginService : ILoginService
-	{
-		private readonly DatabaseContext _context;
-		private readonly IHttpContextAccessor _httpContextAccessor;
+    public class LoginService : ILoginService
+    {
+        private readonly DatabaseContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<LoginService> _logger;
 
-		public LoginService(DatabaseContext context, IHttpContextAccessor httpContextAccessor)
-		{
-			_context = context;
-			_httpContextAccessor = httpContextAccessor;
-		}
+        public LoginService(
+            DatabaseContext context, 
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<LoginService> logger)
+        {
+            _context = context;
+            _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
+        }
 
-		public LoginResult Login(string username, string password)
-		{
-			var user = _context.User.FirstOrDefault(u => u.Username == username);
-			if (user == null || !VerifyPassword(password, user.Password))
-			{
-				return new LoginResult { Success = false, Message = "Invalid username or password" };
-			}
+        public LoginStatus Login(string email, string password, bool isAdminLogin = false)
+        {
+            try
+            {
+                if (isAdminLogin)
+                {
+                    var admin = _context.Admins.FirstOrDefault(a => a.Email == email);
+                    if (admin == null)
+                        return LoginStatus.IncorrectUsername;
 
-			_httpContextAccessor.HttpContext.Session.SetString("UserId", user.UserId.ToString());
-			_httpContextAccessor.HttpContext.Session.SetString("UserRole", user.Role);
+                    string hashedPassword = EncryptionHelper.EncryptPassword(password);
+                    if (admin.Password != hashedPassword)
+                        return LoginStatus.IncorrectPassword;
 
-			return new LoginResult { Success = true, User = user };
-		}
+                    SetAdminSession(admin);
+                    return LoginStatus.Success;
+                }
+                else
+                {
+                    var user = _context.Users.FirstOrDefault(u => u.Email == email);
+                    if (user == null)
+                        return LoginStatus.IncorrectUsername;
 
-		public LoginStatus GetLoginStatus()
-		{
-			var userId = _httpContextAccessor.HttpContext.Session.GetString("UserId");
-			if (string.IsNullOrEmpty(userId))
-			{
-				return new LoginStatus { IsLoggedIn = false };
-			}
+                    string hashedPassword = EncryptionHelper.EncryptPassword(password);
+                    if (user.Password != hashedPassword)
+                        return LoginStatus.IncorrectPassword;
 
-			var user = _context.User.Find(int.Parse(userId));
-			return new LoginStatus { IsLoggedIn = true, Username = user.Username };
-		}
+                    SetUserSession(user);
+                    return LoginStatus.Success;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Login error");
+                return LoginStatus.Unknown;
+            }
+        }
 
-		public RegistrationResult Register(RegisterModel model)
-		{
-			if (_context.User.Any(u => u.Username == model.Username))
-			{
-				return new RegistrationResult { Success = false, Message = "Username already exists" };
-			}
+        private void SetUserSession(User user)
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session == null) return;
 
-			var user = new User
-			{
-				Username = model.Username,
-				Password = Convert.ToBase64String(HashPassword(model.Password)),
-				Email = model.Email,
-				Role = "User"
-			};
+            session.SetInt32("UserId", user.UserId);
+            session.SetString("Email", user.Email);
+            session.SetString("FirstName", user.FirstName);
+            session.SetString("LastName", user.LastName);
+            session.SetString("Role", "User");
+        }
 
-			_context.User.Add(user);
-			_context.SaveChanges();
+        private void SetAdminSession(Admin admin)
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session == null) return;
 
-			return new RegistrationResult { Success = true };
-		}
+            session.SetInt32("AdminId", admin.AdminId);
+            session.SetString("Email", admin.Email);
+            session.SetString("Role", "Admin");
+        }
 
-		private static bool VerifyPassword(string inputPassword, string storedPassword)
-		{
-			// Hash the input password
-			byte[] inputPasswordHash = HashPassword(inputPassword);
-			
-			// Convert the stored password hash from base64 string to byte array
-			byte[] storedPasswordHash = Convert.FromBase64String(storedPassword);
+        public async Task<User> RegisterUser(UserRegistrationDTO registrationDto)
+        {
+            // Check if user already exists
+            var existingUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == registrationDto.Email);
 
-			// Compare the input password hash with the stored password hash
-			return inputPasswordHash.SequenceEqual(storedPasswordHash);
-		}
+            if (existingUser != null)
+                throw new Exception("Email already exists");
 
-		private static byte[] HashPassword(string password)
-		{
-			// Create a new SHA256 hash object
-			using (SHA256 sha256 = SHA256.Create())
-			{
-				// Convert the password to a byte array
-				byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+            var newUser = new User
+            {
+                FirstName = registrationDto.FirstName,
+                LastName = registrationDto.LastName,
+                Email = registrationDto.Email,
+                Password = EncryptionHelper.EncryptPassword(registrationDto.Password),
+                RecuringDays = "", // Default or from DTO
+                Attendances = new List<Attendance>(),
+                Event_Attendances = new List<Event_Attendance>()
+            };
 
-				// Compute the hash of the password
-				return sha256.ComputeHash(passwordBytes);
-			}
-		}
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
 
-		public static string StorePassword(string password)
-		{
-			// Hash the password and convert it to a base64 string for storage
-			byte[] hashedPasswordBytes = HashPassword(password);
-			return Convert.ToBase64String(hashedPasswordBytes); // Return as string
-		}
-	}
+            return newUser;
+        }
+
+        public User? GetLoggedInUser()
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            var userId = session?.GetInt32("UserId");
+
+            if (!userId.HasValue) return null;
+
+            return _context.Users
+                .Include(u => u.Attendances)
+                .Include(u => u.Event_Attendances)
+                .FirstOrDefault(u => u.UserId == userId.Value);
+        }
+
+        public bool IsLoggedIn()
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            return session?.GetString("Role") != null;
+        }
+
+        public bool IsAdmin()
+        {
+            var session = _httpContextAccessor.HttpContext?.Session;
+            return session?.GetString("Role") == "Admin";
+        }
+
+        public void Logout()
+        {
+            _httpContextAccessor.HttpContext?.Session.Clear();
+        }
+    }
 }
-
-

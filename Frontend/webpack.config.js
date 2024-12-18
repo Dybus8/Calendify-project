@@ -1,10 +1,11 @@
 const path = require('path');
 const webpack = require("webpack");
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 module.exports = {
-    mode: 'none', //Can also be development or production https://webpack.js.org/configuration/mode/
+    mode: 'development', //Can also be none or production https://webpack.js.org/configuration/mode/
     entry: {
         app: './src/index.tsx',
     },
@@ -57,7 +58,10 @@ module.exports = {
 
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
-        new CleanWebpackPlugin(['../wwwroot/js'])
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            template: './src/index.tsx',
+        }),
     ]
 
 };
