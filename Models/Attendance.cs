@@ -6,6 +6,6 @@ namespace StarterKit.Models
 
         public DateTime AttendanceDate { get; set; }
 
-        public required User User { get; set; }
+        public required UserAccount User { get; set; }
     }
 }

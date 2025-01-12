@@ -3,9 +3,8 @@ const webpack = require("webpack");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-
 module.exports = {
-    mode: 'development', //Can also be none or production https://webpack.js.org/configuration/mode/
+    mode: 'development',
     entry: {
         app: './src/index.tsx',
     },
@@ -17,7 +16,7 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ["*", ".ts", ".tsx", ".js", ".jsx", ".CSS"]
+        extensions: ["*", ".ts", ".tsx", ".js", ".jsx", ".css"]
     },
 
     module: {
@@ -27,7 +26,6 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: /node_modules/
             },
-
             {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader'],
@@ -52,7 +50,6 @@ module.exports = {
                     }
                 ]
             }
-
         ]
     },
 
@@ -60,8 +57,7 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            template: './src/index.tsx',
+            template: './src/index.html', // Updated to point to the HTML template
         }),
     ]
-
 };

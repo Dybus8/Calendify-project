@@ -10,7 +10,7 @@ namespace StarterKit.Services
         void Logout();
         bool IsLoggedIn();
         bool IsAdmin();
-        User? GetLoggedInUser();
-        Task<User> RegisterUser(UserRegistrationDTO userDTO);
+        UserAccount? GetLoggedInUser();
+        Task<UserAccount> RegisterUser(UserRegistrationDTO userDTO);
     }
 }

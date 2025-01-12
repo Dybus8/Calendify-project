@@ -28,7 +28,7 @@ namespace StarterKit.Services
             {
                 return await _context.Events
                     .Include(e => e.Event_Attendances)
-                        .ThenInclude(ea => ea.User)
+                        .ThenInclude(ea => ea.UserAccount) // Updated to UserAccount
                     .Select(e => new EventDTO
                     {
                         Id = e.EventId,
@@ -48,8 +48,8 @@ namespace StarterKit.Services
                             }).ToList(),
                         Attendees = e.Event_Attendances.Select(ea => new AttendeeDTO
                         {
-                            UserId = ea.User.UserId,
-                            UserName = $"{ea.User.FirstName} {ea.User.LastName}"
+                            Id = ea.UserAccount.Id, // Updated to UserAccount
+                            UserName = $"{ea.UserAccount.FirstName} {ea.UserAccount.LastName}" // Updated to UserAccount
                         }).ToList()
                     })
                     .ToListAsync();
@@ -67,7 +67,7 @@ namespace StarterKit.Services
             {
                 var @event = await _context.Events
                     .Include(e => e.Event_Attendances)
-                        .ThenInclude(ea => ea.User)
+                        .ThenInclude(ea => ea.UserAccount) // Updated to UserAccount
                     .FirstOrDefaultAsync(e => e.EventId == eventId);
 
                 return @event == null 
@@ -91,8 +91,8 @@ namespace StarterKit.Services
                             }).ToListAsync(),
                         Attendees = @event.Event_Attendances.Select(ea => new AttendeeDTO
                         {
-                            UserId = ea.User.UserId,
-                            UserName = $"{ea.User.FirstName} {ea.User.LastName}"
+                            Id = ea.UserAccount.Id, // Updated to UserAccount
+                            UserName = $"{ea.UserAccount.FirstName} {ea.UserAccount.LastName}" // Updated to UserAccount
                         }).ToList()
                     };
             }
@@ -210,7 +210,7 @@ namespace StarterKit.Services
                 var existingAttendance = await _context.EventAttendances
                     .FirstOrDefaultAsync(ea => 
                         ea.EventId == attendEventDto.EventId && 
-                        ea.User.UserId == user.UserId);
+                        ea.UserAccount.Id == user.Id);
 
                 if (existingAttendance != null)
                     throw new EventAttendanceException("User is already attending this event");
@@ -218,8 +218,8 @@ namespace StarterKit.Services
                 var eventAttendance = new Event_Attendance
                 {
                     EventId = attendEventDto.EventId,
-                    UserId = user.UserId,
-                    User = user,
+                    Id = user.Id,
+                    UserAccount = user,
                     Event = @event,
                     Feedback = "",
                     Rating = 0 // Default rating
@@ -228,7 +228,7 @@ namespace StarterKit.Services
                 _context.EventAttendances.Add(eventAttendance);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"User  {user.UserId} attended event {attendEventDto.EventId}");
+                _logger.LogInformation($"User  {user.Id} attended event {attendEventDto.EventId}");
 
                 return await GetEventByIdAsync(attendEventDto.EventId);
             }
@@ -250,8 +250,8 @@ namespace StarterKit.Services
                     .Where(ea => ea.EventId == eventId)
                     .Select(ea => new AttendeeDTO
                     {
-                        UserId = ea.User.UserId,
-                        UserName = $"{ea.User.FirstName} {ea.User.LastName}"
+                        Id = ea.UserAccount.Id,
+                        UserName = $"{ea.UserAccount.FirstName} {ea.UserAccount.LastName}"
                     }).ToListAsync();
             }
             catch (Exception ex)
@@ -261,34 +261,34 @@ namespace StarterKit.Services
             }
         }
 
-        public async Task RemoveEventAttendanceAsync(int eventId, int userId)
+        public async Task RemoveEventAttendanceAsync(int eventId, int Id)
         {
             try 
             {
                 var @event = await _context.Events.FindAsync(eventId)
                     ?? throw new EventNotFoundException(eventId);
 
-                var user = await _context.Users.FindAsync(userId)
+                var user = await _context.UserAccounts.FindAsync(Id)
                     ?? throw new UserNotAuthorizedException("User not found");
 
                 var loggedInUser = _loginService.GetLoggedInUser();
                 var isAdmin = _loginService.IsAdmin();
 
-                if (loggedInUser?.UserId != userId && !isAdmin)
+                if (loggedInUser?.Id != Id && !isAdmin)
                     throw new UserNotAuthorizedException("You are not authorized to remove this attendance");
 
                 var eventAttendance = await _context.EventAttendances
-                    .FirstOrDefaultAsync(ea => ea.EventId == eventId && ea.UserId == userId)
+                    .FirstOrDefaultAsync(ea => ea.EventId == eventId && ea.Id == Id)
                     ?? throw new EventAttendanceException("User is not attending this event");
 
                 _context.EventAttendances.Remove(eventAttendance);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"User {userId} removed from event {eventId}");
+                _logger.LogInformation($"User {Id} removed from event {eventId}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error removing attendance for user {userId} from event {eventId}");
+                _logger.LogError(ex, $"Error removing attendance for user {Id} from event {eventId}");
                 throw;
             }
         }
@@ -310,7 +310,7 @@ namespace StarterKit.Services
 
                 // Check if user has attended the event
                 var hasAttended = await _context.EventAttendances
-                    .AnyAsync(ea => ea.EventId == eventId && ea.User.UserId == user.UserId);
+                    .AnyAsync(ea => ea.EventId == eventId && ea.UserAccount.Id == user.Id);
 
                 if (!hasAttended)
                     throw new EventAttendanceException("Only event attendees can leave a review");
@@ -318,7 +318,7 @@ namespace StarterKit.Services
                 var review = new Review
                 {
                     EventId = eventId,
-                    UserId = user.UserId,
+                    Id = user.Id,
                     Comment = reviewCreateDTO.Comment,
                     Rating = reviewCreateDTO.Rating,
                     CreatedDate = DateTime.UtcNow
@@ -327,7 +327,7 @@ namespace StarterKit.Services
                 _context.Reviews.Add(review);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Review created for event {eventId} by user {user.UserId}");
+                _logger.LogInformation($"Review created for event {eventId} by user {user.Id}");
 
                 return new ReviewDTO
                 {

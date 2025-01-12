@@ -25,16 +25,16 @@ namespace StarterKit.Controllers
         {
             try 
             {
-                var status = _loginService.Login(loginDto.Email, loginDto.Password, isAdminLogin);
+                var status = _loginService.Login(loginDto.UserName, loginDto.Password, isAdminLogin);
                 
                 if (status == LoginStatus.Success)
                 {
-                    var user = _loginService.GetLoggedInUser ();
+                    var user = _loginService.GetLoggedInUser();
                     return Ok(new 
                     { 
                         message = "Login successful",
                         isAdmin = _loginService.IsAdmin(),
-                        userId = user.UserId // Include user ID if needed
+                        userId = user.Id // Updated to use Id
                     });
                 }
                 else if (status == LoginStatus.IncorrectUsername)
@@ -63,10 +63,10 @@ namespace StarterKit.Controllers
             try
             {
                 var user = await _loginService.RegisterUser(registrationDto);
-                return CreatedAtAction(nameof(RegisterUser), new { id = user.UserId }, 
+                return CreatedAtAction(nameof(RegisterUser), new { id = user.Id }, 
                     new { 
                         message = "User registered successfully", 
-                        userId = user.UserId 
+                        userId = user.Id 
                     });
             }
             catch (Exception ex)

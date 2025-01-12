@@ -3,34 +3,29 @@ using StarterKit.Utils;
 
 namespace StarterKit.Models
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
     {
-        public DbSet<Admin> Admins { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Attendance> Attendances { get; set; }
-        public DbSet<Event_Attendance> EventAttendances { get; set; }
-        public DbSet<Event> Events { get; set; }
-        public DbSet<Review> Reviews { get; set; }
-
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
-        {
-        }
+        public DbSet<UserAccount> UserAccounts { get; set; } = null!;
+        public DbSet<Attendance> Attendances { get; set; } = null!;
+        public DbSet<Event_Attendance> EventAttendances { get; set; } = null!;
+        public DbSet<Event> Events { get; set; } = null!;
+        public DbSet<Review> Reviews { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Admin>()
+            modelBuilder.Entity<UserAccount>()
                 .HasIndex(p => p.UserName).IsUnique();
 
-            modelBuilder.Entity<Admin>()
-                .HasData(new Admin { AdminId = 1, Email = "admin1@example.com", UserName = "admin1", Password = EncryptionHelper.EncryptPassword("password") });
-            modelBuilder.Entity<Admin>()
-                .HasData(new Admin { AdminId = 2, Email = "admin2@example.com", UserName = "admin2", Password = EncryptionHelper.EncryptPassword("tooeasytooguess") });
-            modelBuilder.Entity<Admin>()
-                .HasData(new Admin { AdminId = 3, Email = "admin3@example.com", UserName = "admin3", Password = EncryptionHelper.EncryptPassword("helloworld") });
-            modelBuilder.Entity<Admin>()
-                .HasData(new Admin { AdminId = 4, Email = "admin4@example.com", UserName = "admin4", Password = EncryptionHelper.EncryptPassword("Welcome123") });
-            modelBuilder.Entity<Admin>()
-                .HasData(new Admin { AdminId = 5, Email = "admin5@example.com", UserName = "admin5", Password = EncryptionHelper.EncryptPassword("Whatisapassword?") });
+            modelBuilder.Entity<UserAccount>()
+                .HasData(new UserAccount { Id = 1, Email = "admin1@example.com", UserName = "admin1", Password = EncryptionHelper.EncryptPassword("password"), IsAdmin = true, FirstName = "Admin", LastName = "One", RecuringDays = "mo,tu,we,th,fr", Attendances = new List<Attendance>(), Event_Attendances = new List<Event_Attendance>() });
+            modelBuilder.Entity<UserAccount>()
+                .HasData(new UserAccount { Id = 2, Email = "admin2@example.com", UserName = "admin2", Password = EncryptionHelper.EncryptPassword("tooeasytooguess"), IsAdmin = true, FirstName = "Admin", LastName = "Two", RecuringDays = "mo,tu,we,th,fr", Attendances = new List<Attendance>(), Event_Attendances = new List<Event_Attendance>() });
+            modelBuilder.Entity<UserAccount>()
+                .HasData(new UserAccount { Id = 3, Email = "admin3@example.com", UserName = "admin3", Password = EncryptionHelper.EncryptPassword("helloworld"), IsAdmin = true, FirstName = "Admin", LastName = "Three", RecuringDays = "mo,tu,we,th,fr", Attendances = new List<Attendance>(), Event_Attendances = new List<Event_Attendance>() });
+            modelBuilder.Entity<UserAccount>()
+                .HasData(new UserAccount { Id = 4, Email = "admin4@example.com", UserName = "admin4", Password = EncryptionHelper.EncryptPassword("Welcome123"), IsAdmin = true, FirstName = "Admin", LastName = "Four", RecuringDays = "mo,tu,we,th,fr", Attendances = new List<Attendance>(), Event_Attendances = new List<Event_Attendance>() });
+            modelBuilder.Entity<UserAccount>()
+                .HasData(new UserAccount { Id = 5, Email = "admin5@example.com", UserName = "admin5", Password = EncryptionHelper.EncryptPassword("Whatisapassword?"), IsAdmin = true, FirstName = "Admin", LastName = "Five", RecuringDays = "mo,tu,we,th,fr", Attendances = new List<Attendance>(), Event_Attendances = new List<Event_Attendance>() });
         }
     }
 }
