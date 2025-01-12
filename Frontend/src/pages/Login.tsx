@@ -127,18 +127,17 @@ const Login: React.FC = () => {
                     {isLoading ? 'Logging in...' : 'Login'}
                 </button>
 
-                {/* Forgot Password Link  */}
-                <div className="forgot-password">
-                    <a 
-                        href="https://nl.wikipedia.org/wiki/Dementie" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                    >
-                        Forgot Password?
-                    </a>
-                </div>
+                {/* Go Back Button */}
+                <button 
+                    type="button" 
+                    onClick={() => navigate('/')}
+                    className="go-back-button"
+                >
+                    Go Back
+                </button>
 
                 {/* Register Link */}
+
                 <div className="register-link">
                     Don't have an account? 
                     <a href="/register">Register</a>
