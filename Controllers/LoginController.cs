@@ -106,5 +106,26 @@ namespace StarterKit.Controllers
             _loginService.Logout();
             return Ok(new { message = "Logged out successfully" });
         }
+        [HttpGet("log-users")]
+        public async Task<IActionResult> LogUserAccounts()
+        {
+            var users = await _loginService.GetAllUsersAsync(); // Fetch all users
+            foreach (var user in users)
+            {
+                Console.WriteLine($"User: {user.UserName}, Email: {user.Email}, Password: {user.Password}");
+            }
+            return Ok(new { message = "User accounts logged to console." });
+        }
+
+[HttpGet("test-hash")]
+public IActionResult TestHash()
+{
+    string inputPassword = "password";
+    string hashedPassword = EncryptionHelper.EncryptPassword(inputPassword);
+    Console.WriteLine($"Input Password: {inputPassword}, Hashed Password: {hashedPassword}");
+    return Ok(new { inputPassword, hashedPassword });
+}
+
+
     }
 }

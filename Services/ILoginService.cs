@@ -12,5 +12,6 @@ namespace StarterKit.Services
         bool IsAdmin();
         UserAccount? GetLoggedInUser();
         Task<UserAccount> RegisterUser(UserRegistrationDTO userDTO);
+        Task<List<UserAccount>> GetAllUsersAsync();
     }
 }
