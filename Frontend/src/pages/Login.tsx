@@ -21,7 +21,7 @@ const Login: React.FC = () => {
         setMessage('');
 
         try {
-            const response = await fetch('http://localhost:3000/api/Login/login', {
+            const response = await fetch('http://localhost:3000/api/Login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -34,6 +34,7 @@ const Login: React.FC = () => {
             });
 
             const data = await response.json();
+            console.log('API Response:', data); // Added logging
 
             if (response.ok) {
                 // Successful login
@@ -44,11 +45,7 @@ const Login: React.FC = () => {
                 });
 
                 // Navigate based on user role
-                if (data.isAdmin) {
-                    navigate('/admin/dashboard');
-                } else {
-                    navigate('/user/dashboard');
-                }
+                navigate('/dashboard'); // Navigate to the dashboard route
             } else {
                 // Login failed
                 console.error('Login failed:', data.message);

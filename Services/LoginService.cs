@@ -57,7 +57,7 @@ namespace StarterKit.Services
             }
         }
 
-        private void SetUserSession(UserAccount userAccount)
+private void SetUserSession(UserAccount userAccount)
         {
             var session = _httpContextAccessor.HttpContext?.Session;
             if (session == null) return;
@@ -67,7 +67,10 @@ namespace StarterKit.Services
             session.SetString("FirstName", userAccount.FirstName);
             session.SetString("LastName", userAccount.LastName);
             session.SetString("Role", userAccount.IsAdmin ? "Admin" : "User");
+
+            _logger.LogInformation("Session set for user: {Username}, Role: {Role}", userAccount.UserName, userAccount.IsAdmin ? "Admin" : "User");
         }
+
 
         public async Task<UserAccount> RegisterUser(UserRegistrationDTO registrationDto)
         {
@@ -126,8 +129,17 @@ namespace StarterKit.Services
         public bool IsLoggedIn()
         {
             var session = _httpContextAccessor.HttpContext?.Session;
-            return session?.GetString("Role") != null;
+            if (session == null)
+            {
+                _logger.LogWarning("Session is null in IsLoggedIn check");
+                return false;
+            }
+
+            var role = session.GetString("Role");
+            _logger.LogInformation("IsLoggedIn check - Role: {Role}", role);
+            return role != null;
         }
+
 
         public bool IsAdmin()
         {

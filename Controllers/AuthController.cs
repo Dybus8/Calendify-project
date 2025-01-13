@@ -30,7 +30,8 @@ namespace StarterKit.Controllers
 
                 FirstName = userRegistrationDto.FirstName,
                 LastName = userRegistrationDto.LastName,
-                RecuringDays = userRegistrationDto.RecuringDays,
+                RecuringDays = userRegistrationDto.RecuringDays ?? "",
+
                 IsAdmin = false,
                 Attendances = new List<Attendance>(),
                 Event_Attendances = new List<Event_Attendance>()

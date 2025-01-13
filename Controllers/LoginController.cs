@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace StarterKit.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/login")]
     public class LoginController : ControllerBase
     {
         private readonly ILoginService _loginService;
@@ -19,7 +19,7 @@ namespace StarterKit.Controllers
             _logger = logger;
         }
 
-        [HttpPost("login")]
+        [HttpPost]
         public async Task<IActionResult> Login([FromBody] UserLoginDTO loginDto)
         {
             if (loginDto == null)
