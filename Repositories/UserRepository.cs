@@ -16,19 +16,19 @@ namespace StarterKit.Repositories
 
         public async Task AddUserAsync(UserAccount newUser)
         {
-            await _context.Users.AddAsync(newUser);
+            await _context.UserAccounts.AddAsync(newUser);
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<UserAccount>> GetAllUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.UserAccounts.ToListAsync();
         }
 
 
         public async Task<UserAccount> GetUserByIdAsync(int value)
         {
-            var user = await _context.Users
+            var user = await _context.UserAccounts
                 .FirstOrDefaultAsync(u => u.Id == value);
             if (user == null)
             {
@@ -39,7 +39,7 @@ namespace StarterKit.Repositories
 
         public async Task<UserAccount> GetUserByUsernameAsync(string username)
         {
-            var user = await _context.Users
+            var user = await _context.UserAccounts
                 .FirstOrDefaultAsync(u => u.UserName == username);
             if (user == null)
             {
@@ -48,9 +48,15 @@ namespace StarterKit.Repositories
             return user;
         }
 
-        object IUserRepository.GetUserByIdAsync(int value)
+        public async Task RegisterUserAsync(UserAccount newUser)
         {
-            throw new NotImplementedException();
+            await _context.UserAccounts.AddAsync(newUser);
+            await _context.SaveChangesAsync();
+        }
+
+        Task<UserAccount> IUserRepository.GetUserByIdAsync(int value)
+        {
+            return GetUserByIdAsync(value);
         }
     }
 }

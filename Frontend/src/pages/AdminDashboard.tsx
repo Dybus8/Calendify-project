@@ -13,6 +13,7 @@ const AdminDashboard: React.FC = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [userInfo, setUserInfo] = useState<any>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -41,6 +42,23 @@ const AdminDashboard: React.FC = () => {
         fetchUsers();
     }, []);
 
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/api/Login/userinfo', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                setUserInfo(data);
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
+
     const handleLogout = () => {
         logout();
         navigate('/login');
@@ -57,6 +75,15 @@ const AdminDashboard: React.FC = () => {
                 <div className="admin-info">
                     <p>Welcome, {user?.username} (Admin)</p>
                 </div>
+
+                {userInfo ? (
+                    <div>
+                        <p>Username: {userInfo.username}</p>
+                        <p>User ID: {userInfo.userId}</p>
+                    </div>
+                ) : (
+                    <p>Loading user information...</p>
+                )}
 
                 <div className="user-management">
                     <h2>User Management</h2>

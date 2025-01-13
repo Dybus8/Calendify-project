@@ -28,7 +28,7 @@ const Login: React.FC = () => {
                 },
                 credentials: 'include', // Important for cookie-based authentication
                 body: JSON.stringify({ 
-                    Email: username, 
+                    Username: username, 
                     Password: password 
                 }),
             });
@@ -51,6 +51,7 @@ const Login: React.FC = () => {
                 }
             } else {
                 // Login failed
+                console.error('Login failed:', data.message);
                 setMessage(data.message || 'Login failed');
             }
         } catch (error) {

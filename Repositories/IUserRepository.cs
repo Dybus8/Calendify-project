@@ -7,8 +7,9 @@ namespace StarterKit.Repositories
     {
         Task AddUserAsync(UserAccount newUser);
         Task<List<UserAccount>> GetAllUsersAsync();
-        object GetUserByIdAsync(int value);
+        Task<UserAccount> GetUserByIdAsync(int value);
         Task<UserAccount> GetUserByUsernameAsync(string username);
+        Task RegisterUserAsync(UserAccount newUser);
         // Other user-related methods...
     }
 }

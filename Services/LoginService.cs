@@ -23,33 +23,37 @@ namespace StarterKit.Services
             _logger = logger;
         }
 
-        public async Task<LoginStatus> Login(string username, string password, bool isAdminLogin = false)
+        public async Task<UserLoginResultDTO> LoginUserAsync(UserLoginDTO loginDto)
         {
             try
             {
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                if (string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
                 {
-                    return LoginStatus.InvalidPassword;
+                    _logger.LogWarning("Login attempt with empty username or password");
+                    return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidPassword };
                 }
 
-                var user = await _userRepository.GetUserByUsernameAsync(username);
+                var user = await _userRepository.GetUserByUsernameAsync(loginDto.Username);
                 if (user == null)
                 {
-                    return LoginStatus.UserNotFound;
+                    _logger.LogWarning("User not found: {Username}", loginDto.Username);
+                    return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.UserNotFound };
                 }
 
-                if (!EncryptionHelper.VerifyPassword(password, user.Password))
+                if (!EncryptionHelper.VerifyPassword(loginDto.Password, user.Password))
                 {
-                    return LoginStatus.InvalidPassword;
+                    _logger.LogWarning("Invalid password for user: {Username}", loginDto.Username);
+                    return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidPassword };
                 }
 
                 SetUserSession(user);
-                return LoginStatus.Success;
+                _logger.LogInformation("User {Username} logged in successfully", loginDto.Username);
+                return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.Success, User = user };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Login error");
-                return LoginStatus.Unknown;
+                _logger.LogError(ex, "Login error for user: {Username}", loginDto.Username);
+                return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.Unknown };
             }
         }
 
@@ -75,7 +79,7 @@ namespace StarterKit.Services
             var existingUser = await _userRepository.GetUserByUsernameAsync(registrationDto.UserName);
             if (existingUser != null)
             {
-                throw new Exception("Email already exists");
+                throw new Exception("Username already exists");
             }
 
             var newUser = new UserAccount

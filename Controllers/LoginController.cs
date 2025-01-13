@@ -11,28 +11,34 @@ namespace StarterKit.Controllers
     public class LoginController : ControllerBase
     {
         private readonly ILoginService _loginService;
+        private readonly ILogger<LoginController> _logger;
 
-        public LoginController(ILoginService loginService)
+        public LoginController(ILoginService loginService, ILogger<LoginController> logger)
         {
             _loginService = loginService;
+            _logger = logger;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginDTO loginDto)
         {
-            if (loginDto == null || string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
+            if (loginDto == null)
             {
-                return BadRequest("Username and password are required");
+                _logger.LogWarning("Login attempt with null loginDto");
+                return BadRequest("Login data is required");
             }
 
-            var loginStatus = await _loginService.Login(loginDto.Username, loginDto.Password);
-            return loginStatus switch
+            _logger.LogInformation("Login attempt for user: {Username}", loginDto.Username);
+
+            var result = await _loginService.LoginUserAsync(loginDto);
+            if (result == null)
             {
-                LoginStatus.Success => Ok(),
-                LoginStatus.UserNotFound => NotFound("User not found"),
-                LoginStatus.InvalidPassword => Unauthorized("Invalid password"),
-                _ => StatusCode(500, "An error occurred during login")
-            };
+                _logger.LogWarning("Invalid credentials for user: {Username}", loginDto.Username);
+                return Unauthorized(new { message = "Invalid credentials" });
+            }
+
+            _logger.LogInformation("User {Username} logged in successfully", loginDto.Username);
+            return Ok(result);
         }
 
         [HttpPost("register")]
@@ -40,6 +46,7 @@ namespace StarterKit.Controllers
         {
             if (registrationDto == null)
             {
+                _logger.LogWarning("Registration attempt with null registrationDto");
                 return BadRequest("Registration data is required");
             }
 
@@ -50,6 +57,7 @@ namespace StarterKit.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Registration error");
                 return BadRequest(ex.Message);
             }
         }
@@ -64,6 +72,7 @@ namespace StarterKit.Controllers
             }
             catch (KeyNotFoundException)
             {
+                _logger.LogWarning("User not logged in");
                 return Unauthorized("User not logged in");
             }
         }
