@@ -48,12 +48,6 @@ const UserDashboard: React.FC = () => {
                     </div>
                     <div className="dashboard-actions">
                         <button 
-                            className="btn btn-primary"
-                            onClick={() => navigate('/profile')}
-                        >
-                            Edit Profile
-                        </button>
-                        <button 
                             className="btn btn-danger"
                             onClick={handleLogout}
                         >

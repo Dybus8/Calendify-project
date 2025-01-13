@@ -102,12 +102,6 @@ const AdminDashboard: React.FC = () => {
                                     <td>{userData.username}</td>
                                     <td>
                                         <button 
-                                            className="btn btn-edit"
-                                            onClick={() => {/* Edit user */}}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button 
                                             className="btn btn-delete"
                                             onClick={() => {/* Delete user */}}
                                         >
