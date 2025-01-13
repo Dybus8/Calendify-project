@@ -1,63 +1,104 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import './UserDashboard.css'; // Optional: create this file for styling
+import './UserDashboard.css';
 
-const UserDashboard: React.FC = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-    const [userInfo, setUserInfo] = useState<any>(null);
+interface Event {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+}
 
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/api/Login/userinfo', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                setUserInfo(data);
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-            }
-        };
+const UserDashboard = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        fetchUserInfo();
-    }, []);
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events');
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const data = await response.json();
+        setEvents(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return (
-        <div className="user-dashboard">
-            <div className="dashboard-container">
-                <h1>Welcome, {user?.username}!</h1>
-                <div className="dashboard-content">
-                    <h2>User Dashboard</h2>
-                    <div className="user-info">
-                        {userInfo ? (
-                            <div>
-                                <p>Username: {userInfo.username}</p>
-                                <p>User ID: {userInfo.userId}</p>
-                            </div>
-                        ) : (
-                            <p>Loading user information...</p>
-                        )}
-                    </div>
-                    <div className="dashboard-actions">
-                        <button 
-                            className="btn btn-danger"
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+    fetchEvents();
+  }, [user, navigate]);
+
+  const handleAttendEvent = async (eventId: number) => {
+    try {
+      const response = await fetch(`/api/events/${eventId}/attend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ eventId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to attend event');
+      }
+
+      const updatedEvent = await response.json();
+      setEvents(events.map(event => (event.id === updatedEvent.id ? updatedEvent : event)));
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return (
+    <div className="user-dashboard">
+      <h1>User Dashboard</h1>
+      <h2>Events</h2>
+      <div className="events-list">
+        {events.map(event => (
+          <div key={event.id} className="event-card">
+            <h3>{event.title}</h3>
+            <p>{event.description}</p>
+            <p>Date: {event.date}</p>
+            <p>Time: {event.startTime} - {event.endTime}</p>
+            <p>Location: {event.location}</p>
+            <button onClick={() => handleAttendEvent(event.id)}>Attend Event</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default UserDashboard;

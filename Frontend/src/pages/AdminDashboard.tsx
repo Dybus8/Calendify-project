@@ -1,130 +1,156 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import './AdminDashboard.css'; // Optional: create this file for styling
+import './AdminDashboard.css';
 
-interface User {
-    id: number;
-    username: string;
+interface Event {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
 }
 
-const AdminDashboard: React.FC = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-    const [users, setUsers] = useState<User[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [userInfo, setUserInfo] = useState<any>(null);
+interface EventFormData {
+  title: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+}
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await fetch('http://localhost:5097/api/Admin/users', {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+const AdminDashboard = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch users');
-                }
-
-                const data = await response.json();
-                setUsers(data);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                setIsLoading(false);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/api/Login/userinfo', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                setUserInfo(data);
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-            }
-        };
-
-        fetchUserInfo();
-    }, []);
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
-
-    if (isLoading) {
-        return <div>Loading...</div>;
+  useEffect(() => {
+    if (!user || !user.isAdmin) {
+      navigate('/login');
+      return;
     }
 
-    return (
-        <div className="admin-dashboard">
-            <div className="dashboard-container">
-                <h1>Admin Dashboard</h1>
-                <div className="admin-info">
-                    <p>Welcome, {user?.username} (Admin)</p>
-                </div>
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events');
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const data = await response.json();
+        setEvents(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-                {userInfo ? (
-                    <div>
-                        <p>Username: {userInfo.username}</p>
-                        <p>User ID: {userInfo.userId}</p>
-                    </div>
-                ) : (
-                    <p>Loading user information...</p>
-                )}
+    fetchEvents();
+  }, [user, navigate]);
 
-                <div className="user-management">
-                    <h2>User Management</h2>
-                    <table className="users-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map(userData => (
-                                <tr key={userData.id}>
-                                    <td>{userData.id}</td>
-                                    <td>{userData.username}</td>
-                                    <td>
-                                        <button 
-                                            className="btn btn-delete"
-                                            onClick={() => {/* Delete user */}}
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+  const handleCreateEvent = async (eventData: EventFormData) => {
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData),
+      });
 
-                <div className="dashboard-actions">
-                    <button 
-                        className="btn btn-danger"
-                        onClick={handleLogout}
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
+      if (!response.ok) {
+        throw new Error('Failed to create event');
+      }
+
+      const newEvent = await response.json();
+      setEvents([...events, newEvent]);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: number) => {
+    try {
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete event');
+      }
+
+      setEvents(events.filter(event => event.id !== eventId));
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return (
+    <div className="admin-dashboard">
+      <h1>Admin Dashboard</h1>
+      <h2>Events</h2>
+      <div className="events-list">
+        {events.map(event => (
+          <div key={event.id} className="event-card">
+            <h3>{event.title}</h3>
+            <p>{event.description}</p>
+            <p>Date: {event.date}</p>
+            <p>Time: {event.startTime} - {event.endTime}</p>
+            <p>Location: {event.location}</p>
+            <button onClick={() => handleDeleteEvent(event.id)}>Delete Event</button>
+          </div>
+        ))}
+      </div>
+      <h2>Create New Event</h2>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        const eventData: EventFormData = {
+          title: formData.get('title') as string,
+          description: formData.get('description') as string,
+          date: formData.get('date') as string,
+          startTime: formData.get('startTime') as string,
+          endTime: formData.get('endTime') as string,
+          location: formData.get('location') as string,
+        };
+        handleCreateEvent(eventData);
+      }}>
+        <input type="text" name="title" placeholder="Title" required />
+        <textarea name="description" placeholder="Description" required />
+        <input type="date" name="date" required />
+        <input type="time" name="startTime" required />
+        <input type="time" name="endTime" required />
+        <input type="text" name="location" placeholder="Location" required />
+        <button type="submit">Create Event</button>
+      </form>
+    </div>
+  );
 };
 
 export default AdminDashboard;

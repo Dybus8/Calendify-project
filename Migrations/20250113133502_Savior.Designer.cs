@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StarterKit.Models;
 
@@ -10,9 +11,11 @@ using StarterKit.Models;
 namespace StarterKit.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250113133502_Savior")]
+    partial class Savior
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -72,30 +75,6 @@ namespace StarterKit.Migrations
                     b.HasKey("EventId");
 
                     b.ToTable("Events");
-
-                    b.HasData(
-                        new
-                        {
-                            EventId = 1,
-                            AdminApproval = true,
-                            Description = "Description for Event One",
-                            EndTime = new TimeSpan(0, 12, 0, 0, 0),
-                            EventDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Location One",
-                            StartTime = new TimeSpan(0, 10, 0, 0, 0),
-                            Title = "Event One"
-                        },
-                        new
-                        {
-                            EventId = 2,
-                            AdminApproval = true,
-                            Description = "Description for Event Two",
-                            EndTime = new TimeSpan(0, 16, 0, 0, 0),
-                            EventDate = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Location Two",
-                            StartTime = new TimeSpan(0, 14, 0, 0, 0),
-                            Title = "Event Two"
-                        });
                 });
 
             modelBuilder.Entity("StarterKit.Models.Event_Attendance", b =>

@@ -19,7 +19,6 @@ namespace StarterKit
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddDistributedMemoryCache();
-            
             builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddSession(options => 
@@ -37,10 +36,6 @@ namespace StarterKit
             // Register DatabaseContext
             builder.Services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            // Database context
-            builder.Services.AddDbContext<ApplicationDbContext>(
-                options => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteDb")));
 
             var app = builder.Build();
 
@@ -64,7 +59,7 @@ namespace StarterKit
             // Ensure database is created
             using (var scope = app.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
                 context.Database.EnsureCreated();
             }
 

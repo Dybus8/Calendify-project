@@ -103,11 +103,17 @@ namespace StarterKit.Controllers
 
         [Authorize]
         [HttpPost("{eventId}/attend")]
-        public async Task<ActionResult<EventDTO>> AttendEvent(int eventId)
+        public async Task<ActionResult<EventDTO>> AttendEvent(int eventId, [FromBody] AttendEventDTO attendEventDto)
         {
             try
             {
-                var attendEventDto = new AttendEventDTO { EventId = eventId };
+                // Check event availability before allowing attendance
+                var isAvailable = await _eventService.CheckEventAvailabilityAsync(eventId, attendEventDto);
+                if (!isAvailable)
+                {
+                    return BadRequest(new { message = "Event is not available for attendance." });
+                }
+
                 var updatedEvent = await _eventService.AttendEventAsync(attendEventDto);
                 return Ok(updatedEvent);
             }
@@ -147,6 +153,23 @@ namespace StarterKit.Controllers
                 
                 await _eventService.RemoveEventAttendanceAsync(eventId, userId);
                 return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // New endpoint for office attendance management
+        [Authorize]
+        [HttpPost("attendance")]
+        public async Task<IActionResult> ManageOfficeAttendance([FromBody] OfficeAttendanceDTO officeAttendanceDto)
+        {
+            try
+            {
+                // Logic to manage office attendance
+                await _eventService.ManageOfficeAttendanceAsync(officeAttendanceDto);
+                return Ok(new { message = "Attendance recorded successfully." });
             }
             catch (Exception ex)
             {

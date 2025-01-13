@@ -339,5 +339,74 @@ namespace StarterKit.Services
                 throw;
             }
         }
+
+        public async Task<bool> CheckEventAvailabilityAsync(int eventId, AttendEventDTO attendEventDto)
+        {
+            try
+            {
+                var @event = await _context.Events.FindAsync(eventId)
+                    ?? throw new EventNotFoundException(eventId);
+
+                // Check if the event date is in the future
+                if (@event.EventDate.Date < DateTime.Today.Date)
+                    return false;
+
+                // Check if the event is at capacity (if applicable)
+                var attendeeCount = await _context.EventAttendances
+                    .CountAsync(ea => ea.EventId == eventId);
+
+                // Assuming a max capacity of 100 for this example
+                if (attendeeCount >= 100)
+                    return false;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking availability for event {eventId}");
+                throw;
+            }
+        }
+
+        public async Task ManageOfficeAttendanceAsync(OfficeAttendanceDTO officeAttendanceDto)
+        {
+            try
+            {
+                var user = await _context.UserAccounts.FindAsync(officeAttendanceDto.UserId)
+                    ?? throw new KeyNotFoundException("User not found");
+
+                // Check if the user already has an attendance record for the given date
+                var existingAttendance = await _context.Attendances
+                    .FirstOrDefaultAsync(a => 
+                        a.User.Id == officeAttendanceDto.UserId && 
+                        a.AttendanceDate.Date == officeAttendanceDto.AttendanceDate.Date);
+
+                if (existingAttendance != null)
+                {
+                    // Update existing attendance
+                    existingAttendance.Notes = officeAttendanceDto.Notes;
+                }
+                else
+                {
+                    // Create new attendance
+                    var attendance = new Attendance
+                    {
+                        User = user,
+                        AttendanceDate = officeAttendanceDto.AttendanceDate,
+                        Notes = officeAttendanceDto.Notes
+                    };
+
+                    _context.Attendances.Add(attendance);
+                }
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"Office attendance recorded for user {officeAttendanceDto.UserId} on {officeAttendanceDto.AttendanceDate}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error managing office attendance");
+                throw;
+            }
+        }
     }
 }

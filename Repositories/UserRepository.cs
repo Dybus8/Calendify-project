@@ -7,9 +7,9 @@ namespace StarterKit.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly DatabaseContext _context;
 
-        public UserRepository(ApplicationDbContext context)
+        public UserRepository(DatabaseContext context)
         {
             _context = context;
         }

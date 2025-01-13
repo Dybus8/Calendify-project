@@ -11,8 +11,8 @@ using StarterKit.Models;
 namespace StarterKit.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250112201954_CombineUsersAndAdmins")]
-    partial class CombineUsersAndAdmins
+    [Migration("20250113134111_SeedEvents")]
+    partial class SeedEvents
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,6 +27,9 @@ namespace StarterKit.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("AttendanceDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
@@ -72,6 +75,30 @@ namespace StarterKit.Migrations
                     b.HasKey("EventId");
 
                     b.ToTable("Events");
+
+                    b.HasData(
+                        new
+                        {
+                            EventId = 1,
+                            AdminApproval = true,
+                            Description = "Description for Event One",
+                            EndTime = new TimeSpan(0, 12, 0, 0, 0),
+                            EventDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Location = "Location One",
+                            StartTime = new TimeSpan(0, 10, 0, 0, 0),
+                            Title = "Event One"
+                        },
+                        new
+                        {
+                            EventId = 2,
+                            AdminApproval = true,
+                            Description = "Description for Event Two",
+                            EndTime = new TimeSpan(0, 16, 0, 0, 0),
+                            EventDate = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Location = "Location Two",
+                            StartTime = new TimeSpan(0, 14, 0, 0, 0),
+                            Title = "Event Two"
+                        });
                 });
 
             modelBuilder.Entity("StarterKit.Models.Event_Attendance", b =>
