@@ -9,6 +9,7 @@ export default function Home() {
       <h2>B.I.R. Bal Is Rond</h2>
       <div className="mt-4">
         <Link to="/login" className="btn btn-primary">Login</Link>
+        <Link to="/register" className="btn btn-secondary ml-2">Register</Link> {/* New Register Button */}
       </div>
     </div>
   );

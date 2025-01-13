@@ -21,7 +21,7 @@ const Login: React.FC = () => {
         setMessage('');
 
         try {
-            const response = await fetch('http://localhost:<port>/api/Login/login', {
+            const response = await fetch('http://localhost:3000/api/Login/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -137,7 +137,6 @@ const Login: React.FC = () => {
                 </button>
 
                 {/* Register Link */}
-
                 <div className="register-link">
                     Don't have an account? 
                     <a href="/register">Register</a>

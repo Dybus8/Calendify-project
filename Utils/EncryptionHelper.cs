@@ -18,5 +18,17 @@ namespace StarterKit.Utils
                 return builder.ToString();
             }
         }
+
+        public static bool VerifyPassword(string password, string encryptedPassword)
+        {
+            // Handle null or empty inputs
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(encryptedPassword))
+            {
+                return false;
+            }
+
+            // Compare the hashed password with the stored encrypted password
+            return EncryptPassword(password) == encryptedPassword;
+        }
     }
 }

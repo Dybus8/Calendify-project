@@ -1,10 +1,21 @@
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace StarterKit.Models.DTOs
 {
     public class LoginDTO
     {
-        public required string UserName { get; set; }
-        public required string Password { get; set; }
+        [JsonPropertyName("username")]
+        public string Username { get; set; } = string.Empty;
+
+        [JsonPropertyName("password")]
+        public string Password { get; set; } = string.Empty;
+
+        public LoginDTO() { }
+
+        public LoginDTO(string username, string password)
+        {
+            Username = username;
+            Password = password;
+        }
     }
 }

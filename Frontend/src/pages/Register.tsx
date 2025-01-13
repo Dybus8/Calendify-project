@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/AuthService"; // Adjust the import path as needed
+import "./Register.css"; // Import the CSS file
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -30,6 +31,10 @@ const Register: React.FC = () => {
         } catch (err) {
             setError("Registration failed. Please try again.");
         }
+    };
+
+    const handleGoBack = () => {
+        navigate("/"); // Redirect to home page
     };
 
     return (
@@ -88,6 +93,7 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <button type="submit">Register</button>
+                <button type="button" onClick={handleGoBack} className="go-back-button">Go Back</button>
             </form>
         </div>
     );

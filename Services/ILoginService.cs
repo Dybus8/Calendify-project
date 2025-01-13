@@ -1,17 +1,19 @@
-using StarterKit.Models.DTOs;
 using StarterKit.Models;
+using StarterKit.Models.DTOs;
 using StarterKit.Utils;
+using System.Threading.Tasks;
 
 namespace StarterKit.Services
 {
     public interface ILoginService
     {
-        LoginStatus Login(string email, string password, bool isAdminLogin = false);
-        void Logout();
+        Task<LoginStatus> Login(string username, string password, bool isAdminLogin = false);
+        Task<UserAccount> RegisterUser(UserRegistrationDTO registrationDto);
+        Task<UserSessionInfo> GetCurrentUserSessionInfoAsync();
         bool IsLoggedIn();
         bool IsAdmin();
-        UserAccount? GetLoggedInUser();
-        Task<UserAccount> RegisterUser(UserRegistrationDTO userDTO);
+        void Logout();
         Task<List<UserAccount>> GetAllUsersAsync();
+        Task<UserAccount> GetUserByUserNameAsync(string username);
     }
 }

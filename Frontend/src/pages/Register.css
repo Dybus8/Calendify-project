@@ -1,0 +1,51 @@
+.register-container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.register-container h2 {
+    text-align: center;
+}
+
+.register-container .error-message {
+    color: red;
+    text-align: center;
+}
+
+.register-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-container form div {
+    margin-bottom: 15px;
+}
+
+.register-container button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.register-container button:hover {
+    background-color: #0056b3;
+}
+
+.go-back-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.go-back-button:hover {
+    background-color: #5a6268;
+}

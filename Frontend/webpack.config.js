@@ -1,30 +1,23 @@
+// filepath: /c:/Users/aidan/OneDrive/Documenten/GitHub/New_Group_Project/Calendify-project/Frontend/webpack.config.js
 const path = require('path');
-const webpack = require("webpack");
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    entry: {
-        app: './src/index.tsx',
-    },
-
+    entry: './src/index.tsx',
     output: {
         filename: 'main.js',
-        publicPath: "",
-        path: path.resolve(__dirname, '../wwwroot/js')
+        path: path.resolve(__dirname, '../wwwroot/js'),
+        publicPath: '/js/',
     },
-
     resolve: {
-        extensions: ["*", ".ts", ".tsx", ".js", ".jsx", ".css"]
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.css'],
     },
-
     module: {
         rules: [
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
-                exclude: /node_modules/
+                exclude: /node_modules/,
             },
             {
                 test: /\.css$/,
@@ -32,32 +25,15 @@ module.exports = {
             },
             {
                 test: /\.(png|jpg|gif)$/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {},
-                    },
-                ],
+                use: 'file-loader',
             },
-            {
-                test: /\.(png|jpg|gif)$/i,
-                use: [
-                    {
-                        loader: 'url-loader',
-                        options: {
-                            limit: 8192
-                        }
-                    }
-                ]
-            }
-        ]
+        ],
     },
-
-    plugins: [
-        new webpack.HotModuleReplacementPlugin(),
-        new CleanWebpackPlugin(),
-        new HtmlWebpackPlugin({
-            template: './src/index.html', // Updated to point to the HTML template
-        }),
-    ]
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'public'),
+        },
+        hot: true,
+        port: 3000,
+    },
 };

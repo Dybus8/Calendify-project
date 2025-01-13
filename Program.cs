@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StarterKit.Models;
 using StarterKit.Services;
+using StarterKit.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace StarterKit
@@ -31,11 +32,14 @@ namespace StarterKit
             // Register services
             builder.Services.AddScoped<ILoginService, LoginService>();
             builder.Services.AddScoped<IEventService, EventService>();
-            //builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-            //builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            // Register DatabaseContext
+            builder.Services.AddDbContext<DatabaseContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Database context
-            builder.Services.AddDbContext<DatabaseContext>(
+            builder.Services.AddDbContext<ApplicationDbContext>(
                 options => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteDb")));
 
             var app = builder.Build();
@@ -60,7 +64,7 @@ namespace StarterKit
             // Ensure database is created
             using (var scope = app.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 context.Database.EnsureCreated();
             }
 
