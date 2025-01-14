@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import axios from 'axios';
+import { loginUser } from '../services/AuthService';
 
 interface User {
   id: number;
-  username: string;
+  userName: string;  // Changed from username to userName
   isAdmin: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (userName: string, password: string) => Promise<void>;  // Changed username to userName
   logout: () => void;
 }
 
@@ -22,18 +22,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (username: string, password: string) => {
+  const login = async (userName: string, password: string) => {  // Changed username to userName
     try {
-      console.log('Sending login request with:', { username, password });
-      const response = await axios.post('/api/login', { username, password });
-      console.log('API Response:', response.data);
-      setUser(response.data.user);
-      console.log('Logging in user:', response.data.user);
+      const result = await loginUser({ userName, password });
+      setUser(result.user);
     } catch (error) {
-      console.error('Login failed:', error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Response data:', error.response.data);
-      }
+      console.error('Login error:', error);
+      throw error;
     }
   };
 

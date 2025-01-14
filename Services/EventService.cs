@@ -288,7 +288,7 @@ namespace StarterKit.Services
             }
         }
 
-        public async Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO)
+        public async Task<ReviewDTO> CreateReviewAsync(int eventId, Models.DTOs.ReviewCreateDTO reviewCreateDTO)
         {
             try 
             {
@@ -310,8 +310,8 @@ namespace StarterKit.Services
                 var review = new Review
                 {
                     EventId = eventId,
-                    Id = userSession.UserId,
-                    Comment = reviewCreateDTO.Comment,
+                    UserId = userSession.UserId,
+                    Comment = reviewCreateDTO.Comment ?? "",
                     Rating = reviewCreateDTO.Rating,
                     CreatedDate = DateTime.UtcNow
                 };
@@ -319,13 +319,13 @@ namespace StarterKit.Services
                 _context.Reviews.Add(review);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Review created for event {eventId} by user {userSession.UserId}");
-
                 return new ReviewDTO
                 {
                     Id = review.Id,
                     Comment = review.Comment,
-                    Rating = review.Rating
+                    Rating = review.Rating,
+                    UserName = userSession.FirstName + " " + userSession.LastName,
+                    CreatedDate = DateTime.UtcNow // Fixed DateTime conversion
                 };
             }
             catch (Exception ex)

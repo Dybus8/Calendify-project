@@ -8,7 +8,7 @@ const Login: React.FC = () => {
     const { login } = useAuth();
     
     // State management
-    const [username, setUsername] = useState('');
+    const [userName, setUserName] = useState('');  // Changed from username to userName
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -21,12 +21,14 @@ const Login: React.FC = () => {
         setMessage('');
 
         try {
-            await login(username, password);
+            await login(userName, password);  // Changed from username to userName
             navigate('/dashboard'); // Navigate to the dashboard route
         } catch (error) {
-            // Network or unexpected error
-            console.error('Login error:', error);
-            setMessage('An error occurred during login. Please try again.');
+            if (error instanceof Error) {
+                setMessage(error.message);
+            } else {
+                setMessage('An unexpected error occurred');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -44,12 +46,12 @@ const Login: React.FC = () => {
                 
                 {/* Username Input */}
                 <div className="form-group">
-                    <label htmlFor="username">Username</label>
+                    <label htmlFor="userName">Username</label>
                     <input 
                         type="text" 
-                        id="username"
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)} 
+                        id="userName"
+                        value={userName} 
+                        onChange={(e) => setUserName(e.target.value)} 
                         placeholder="Enter your username" 
                         required 
                         disabled={isLoading}

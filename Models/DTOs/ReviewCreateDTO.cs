@@ -1,5 +1,3 @@
-using System;
-
 namespace StarterKit.Models.DTOs
 {
     public class ReviewCreateDTO

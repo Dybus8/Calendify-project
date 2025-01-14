@@ -16,7 +16,7 @@ namespace StarterKit.Services
         Task<EventDTO> AttendEventAsync(int eventId, int userId);
         Task<IEnumerable<AttendeeDTO>> GetEventAttendeesAsync(int eventId);
         Task RemoveEventAttendanceAsync(int eventId, int Id);
-        Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO);
+        Task<ReviewDTO> CreateReviewAsync(int eventId, Models.DTOs.ReviewCreateDTO reviewCreateDTO);
         Task<bool> CheckEventAvailabilityAsync(int eventId, AttendEventDTO attendEventDto);
         Task ManageOfficeAttendanceAsync(OfficeAttendanceDTO officeAttendanceDto);
     }

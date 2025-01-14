@@ -31,6 +31,7 @@ namespace StarterKit
             // Register services
             builder.Services.AddScoped<ILoginService, LoginService>();
             builder.Services.AddScoped<IEventService, EventService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             // Register DatabaseContext
