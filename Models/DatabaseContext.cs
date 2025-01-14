@@ -17,8 +17,26 @@ namespace StarterKit.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Review>()
+            .Property(r => r.Rating)
+                .IsRequired()
+                .HasDefaultValue(0)
+                .HasAnnotation("MinValue", 1)
+                .HasAnnotation("MaxValue", 10);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Event)
+                .WithMany(e => e.Reviews)
+                .HasForeignKey(r => r.EventId);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(r => r.UserId);
             modelBuilder.Entity<UserAccount>()
                 .HasIndex(p => p.UserName).IsUnique();
+
+            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserAccount>()
                 .HasData(

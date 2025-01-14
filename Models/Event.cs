@@ -19,5 +19,8 @@ namespace StarterKit.Models
         public bool AdminApproval { get; set; }
 
         public required List<Event_Attendance> Event_Attendances { get; set; }
+
+        // New Property for Reviews
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }
