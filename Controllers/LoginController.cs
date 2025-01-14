@@ -37,8 +37,25 @@ namespace StarterKit.Controllers
                 return Unauthorized(new { message = "Invalid credentials" });
             }
 
-            _logger.LogInformation("User {Username} logged in successfully", loginDto.Username);
-            return Ok(result);
+            switch (result.Status)
+            {
+                case StarterKit.Utils.LoginStatus.Success:
+                    _logger.LogInformation("User {Username} logged in successfully", loginDto.Username);
+                    return Ok(result);
+                case StarterKit.Utils.LoginStatus.InvalidCredentials:
+                    _logger.LogWarning("Invalid credentials for user: {Username}", loginDto.Username);
+                    return Unauthorized(new { message = "Invalid credentials" });
+                case StarterKit.Utils.LoginStatus.UserNotFound:
+                    _logger.LogWarning("User not found: {Username}", loginDto.Username);
+                    return NotFound(new { message = "User not found" });
+                case StarterKit.Utils.LoginStatus.InvalidPassword:
+                    _logger.LogWarning("Invalid password for user: {Username}", loginDto.Username);
+                    return Unauthorized(new { message = "Invalid password" });
+                case StarterKit.Utils.LoginStatus.Unknown:
+                default:
+                    _logger.LogError("Unknown error during login for user: {Username}", loginDto.Username);
+                    return StatusCode(500, new { message = "An error occurred during login" });
+            }
         }
 
         [HttpPost("register")]
@@ -58,7 +75,11 @@ namespace StarterKit.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Registration error");
-                return BadRequest(ex.Message);
+                if (ex.Message == "Username already exists")
+                {
+                    return Conflict(new { message = ex.Message });
+                }
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -73,7 +94,7 @@ namespace StarterKit.Controllers
             catch (KeyNotFoundException)
             {
                 _logger.LogWarning("User not logged in");
-                return Unauthorized("User not logged in");
+                return Unauthorized(new { message = "User not logged in" });
             }
         }
 

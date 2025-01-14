@@ -5,6 +5,7 @@ namespace StarterKit.Utils
         Success,
         Unknown,
         UserNotFound,
-        InvalidPassword
+        InvalidPassword,
+        InvalidCredentials // Added new status for invalid credentials
     }
 }
