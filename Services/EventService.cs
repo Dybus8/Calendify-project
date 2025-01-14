@@ -25,6 +25,60 @@ namespace StarterKit.Services
 			_logger = logger;
 		}
 
+		public async Task<UserAccountDTO> GetUserAccountAsync(int userId)
+		{
+			try
+			{
+				var userAccount = await _context.UserAccounts.FindAsync(userId)
+					?? throw new KeyNotFoundException("User not found");
+
+				return new UserAccountDTO
+				{
+					UserId = userAccount.Id,
+					Username = userAccount.UserName,
+					Points = userAccount.Points,
+					FirstName = userAccount.FirstName,
+					LastName = userAccount.LastName,
+					Email = userAccount.Email
+				};
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"Error retrieving user account with ID {userId}");
+				throw;
+			}
+		}
+
+		public async Task<UserAccountDTO> UpdateUserAccountAsync(int userId, UserAccountDTO userAccountDTO)
+		{
+			try
+			{
+				var userAccount = await _context.UserAccounts.FindAsync(userId)
+					?? throw new KeyNotFoundException("User not found");
+
+				userAccount.FirstName = userAccountDTO.FirstName;
+				userAccount.LastName = userAccountDTO.LastName;
+				userAccount.Email = userAccountDTO.Email;
+
+				await _context.SaveChangesAsync();
+
+				return new UserAccountDTO
+				{
+					UserId = userAccount.Id,
+					Username = userAccount.UserName,
+					Points = userAccount.Points,
+					FirstName = userAccount.FirstName,
+					LastName = userAccount.LastName,
+					Email = userAccount.Email
+				};
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"Error updating user account with ID {userId}");
+				throw;
+			}
+		}
+
 		public async Task<IEnumerable<EventDTO>> GetEventsAsync()
 		{
 			try 
@@ -115,12 +169,12 @@ namespace StarterKit.Services
 
 				var newEvent = new Event
 				{
-					Title = eventCreateDTO.Title,
-					Description = eventCreateDTO.Description,
+					Title = eventCreateDTO?.Title ?? throw new ArgumentNullException(nameof(eventCreateDTO.Title)),
+					Description = eventCreateDTO.Description ?? string.Empty,
 					EventDate = eventCreateDTO.Date,
 					StartTime = eventCreateDTO.StartTime,
 					EndTime = eventCreateDTO.EndTime,
-					Location = eventCreateDTO.Location,
+					Location = eventCreateDTO.Location ?? string.Empty,
 					Points = eventCreateDTO.Points,
 					AdminApproval = true,
 					Event_Attendances = new List<Event_Attendance>()

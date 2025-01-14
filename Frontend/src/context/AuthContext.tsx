@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import axios from 'axios';
 
+// Configure axios with base URL
+axios.defaults.baseURL = 'http://localhost:3001'; // Adjust this port to match your backend
+
 interface User {
   id: number;
   username: string;
@@ -25,21 +28,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (username: string, password: string) => {
     try {
       console.log('Sending login request with:', { username, password });
-      const response = await axios.post('/api/login', { username, password });
+      const response = await axios.post('http://localhost:3000/api/login', { 
+        username, 
+        password 
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
       console.log('API Response:', response.data);
       setUser(response.data.user);
       console.log('Logging in user:', response.data.user);
     } catch (error) {
       console.error('Login failed:', error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Response data:', error.response.data);
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('Response data:', error.response.data);
+          alert(`Login failed: ${error.response.data.message || 'Internal Server Error'}`);
+        } else {
+          alert('Login failed: No response from server');
+        }
+      } else {
+        alert('Login failed: An unexpected error occurred');
       }
     }
   };
 
   const logout = () => {
     setUser(null);
-    // Add any additional logout logic here
   };
 
   return (
@@ -56,3 +73,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+//Help 

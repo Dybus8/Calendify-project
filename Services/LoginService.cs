@@ -42,7 +42,7 @@ namespace StarterKit.Services
 
 				if (!EncryptionHelper.VerifyPassword(loginDto.Password, user.Password))
 				{
-					_logger.LogWarning("Invalid password for user: {Username", loginDto.Username);
+					_logger.LogWarning("Invalid password for user: {Username}", loginDto.Username);
 					return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidPassword };
 				}
 
