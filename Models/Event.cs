@@ -7,6 +7,7 @@ namespace StarterKit.Models
         public required string Title { get; set; }
 
         public required string Description { get; set; }
+        public int Points { get; set; }
 
         public DateTime EventDate { get; set; }
 
