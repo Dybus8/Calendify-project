@@ -10,6 +10,7 @@ interface Event {
   date: string;
   startTime: string;
   endTime: string;
+  points: string;
   location: string;
 }
 
@@ -19,6 +20,7 @@ interface EventFormData {
   date: string;
   startTime: string;
   endTime: string;
+  points: string;
   location: string;
 }
 
@@ -123,6 +125,7 @@ const AdminDashboard = () => {
             <h3>{event.title}</h3>
             <p>{event.description}</p>
             <p>Date: {event.date}</p>
+            
             <p>Time: {event.startTime} - {event.endTime}</p>
             <p>Location: {event.location}</p>
             <button onClick={() => handleDeleteEvent(event.id)}>Delete Event</button>
@@ -138,6 +141,7 @@ const AdminDashboard = () => {
           title: formData.get('title') as string,
           description: formData.get('description') as string,
           date: formData.get('date') as string,
+          points: formData.get('points') as string,
           startTime: formData.get('startTime') as string,
           endTime: formData.get('endTime') as string,
           location: formData.get('location') as string,
@@ -149,6 +153,7 @@ const AdminDashboard = () => {
         <input type="date" name="date" required />
         <input type="time" name="startTime" required />
         <input type="time" name="endTime" required />
+        <input type="text" name="points" placeholder="Points" required />
         <input type="text" name="location" placeholder="Location" required />
         <button type="submit">Create Event</button>
       </form>
