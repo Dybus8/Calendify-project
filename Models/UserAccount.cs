@@ -2,7 +2,7 @@ namespace StarterKit.Models
 {
     public class UserAccount
     {
-        public required int Id { get; set; } // Can be used for both AdminId and UserId
+        public int Id { get; set; } // Removed 'required' to allow database to handle Id assignment
         public required string UserName { get; set; }
         public required string Password { get; set; }
         public required string Email { get; set; }

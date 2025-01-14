@@ -62,10 +62,10 @@ namespace StarterKit.Services
             var session = _httpContextAccessor.HttpContext?.Session;
             if (session == null) return;
 
-            session.SetInt32("UserId", userAccount.Id);
-            session.SetString("Email", userAccount.Email);
-            session.SetString("FirstName", userAccount.FirstName);
-            session.SetString("LastName", userAccount.LastName);
+            session.SetInt32("UserId", userAccount.Id); // Ensure Id is set correctly
+            session.SetString("Email", userAccount.Email ?? string.Empty);
+            session.SetString("FirstName", userAccount.FirstName ?? string.Empty);
+            session.SetString("LastName", userAccount.LastName ?? string.Empty);
             session.SetString("Role", userAccount.IsAdmin ? "Admin" : "User");
 
             _logger.LogInformation("Session set for user: {Username}, Role: {Role}", userAccount.UserName, userAccount.IsAdmin ? "Admin" : "User");
@@ -87,10 +87,10 @@ namespace StarterKit.Services
             var newUser = new UserAccount
             {
                 UserName = registrationDto.UserName,
-                FirstName = registrationDto.FirstName,
-                LastName = registrationDto.LastName,
-                Email = registrationDto.Email,
-                Password = EncryptionHelper.EncryptPassword(registrationDto.Password),
+                FirstName = registrationDto.FirstName ?? string.Empty,
+                LastName = registrationDto.LastName ?? string.Empty,
+                Email = registrationDto.Email ?? string.Empty,
+                Password = EncryptionHelper.EncryptPassword(registrationDto.Password ?? string.Empty),
                 IsAdmin = false,
                 RecuringDays = "",
                 Attendances = new List<Attendance>(),

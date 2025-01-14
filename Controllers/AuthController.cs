@@ -6,7 +6,6 @@ using StarterKit.Utils;
 using System.Threading.Tasks;
 
 namespace StarterKit.Controllers
-
 {
     [ApiController]
     [Route("api/register")]
@@ -25,13 +24,11 @@ namespace StarterKit.Controllers
             var newUser = new UserAccount
             {
                 UserName = userRegistrationDto.UserName,
-                Password = EncryptionHelper.EncryptPassword(userRegistrationDto.Password),
-                Email = userRegistrationDto.Email,
-
-                FirstName = userRegistrationDto.FirstName,
-                LastName = userRegistrationDto.LastName,
+                Password = EncryptionHelper.EncryptPassword(userRegistrationDto.Password ?? throw new ArgumentNullException(nameof(userRegistrationDto.Password))),
+                Email = userRegistrationDto.Email ?? throw new ArgumentNullException(nameof(userRegistrationDto.Email)),
+                FirstName = userRegistrationDto.FirstName ?? throw new ArgumentNullException(nameof(userRegistrationDto.FirstName)),
+                LastName = userRegistrationDto.LastName ?? throw new ArgumentNullException(nameof(userRegistrationDto.LastName)),
                 RecuringDays = userRegistrationDto.RecuringDays ?? "",
-
                 IsAdmin = false,
                 Attendances = new List<Attendance>(),
                 Event_Attendances = new List<Event_Attendance>()
