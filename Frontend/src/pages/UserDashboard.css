@@ -1,10 +1,21 @@
-.user-dashboard {
+.user-dashboard h1{
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    align-items: flex-start;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     padding: 2rem;
+    margin-bottom: 10px;
+    font-size: 36px;
+}
+
+.user-dashboard h2{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem;
+    margin-bottom: 20px;
+    font-size: 24px;
 }
 
 
@@ -22,6 +33,23 @@
     width: 100%;
     max-width: 500px;
 }
+
+.event-card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+    
+}
+
+.event-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
 
 .dashboard-actions {
     display: flex;
