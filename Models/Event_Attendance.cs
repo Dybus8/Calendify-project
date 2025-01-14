@@ -1,14 +1,15 @@
 namespace StarterKit.Models
 {
-	public class Event_Attendance
-	{
-		public int Event_AttendanceId { get; set; }
-		public int Rating { get; set; }
-		public required string Feedback { get; set; }
-		public required UserAccount UserAccount { get; set; } // Updated to UserAccount
-		public required Event Event { get; set; }
-		public int Id { get; internal set; }
-		public int EventId { get; internal set; }
-		public required int Points { get; set; }
-	}
+    public class Event_Attendance
+    {
+        public int Event_AttendanceId { get; set; }
+        public int EventId { get; set; }
+        public int UserId { get; set; }
+        public DateTime AttendanceDate { get; set; }
+        public string? Feedback { get; set; } // Marked as nullable
+        public int Points { get; set; } // Default value can be set in the constructor
+
+        public virtual UserAccount? UserAccount { get; set; } // Marked as nullable
+        public virtual Event? Event { get; set; } // Marked as nullable
+    }
 }

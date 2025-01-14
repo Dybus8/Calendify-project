@@ -1,27 +1,24 @@
 using StarterKit.Models;
 using StarterKit.Models.DTOs;
-
-
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace StarterKit.Services
 {
-	public interface IEventService
-	{
-		Task<IEnumerable<EventDTO>> GetEventsAsync();
-		Task<EventDTO> GetEventByIdAsync(int eventId);
-		Task<EventDTO> CreateEventAsync(EventCreateDTO eventCreateDTO);
-		Task<EventDTO> UpdateEventAsync(int eventId, EventUpdateDTO eventUpdateDTO);
-		Task DeleteEventAsync(int eventId);
-		Task<UserAccountDTO> GetUserAccountAsync(int userId);
-		Task<UserAccountDTO> UpdateUserAccountAsync(int userId, UserAccountDTO userAccountDTO);
-		Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto);
-		Task<EventDTO> AttendEventAsync(int eventId, int userId);
-		Task<IEnumerable<AttendeeDTO>> GetEventAttendeesAsync(int eventId);
-		Task RemoveEventAttendanceAsync(int eventId, int Id);
-		Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO);
-		Task<bool> CheckEventAvailabilityAsync(int eventId, AttendEventDTO attendEventDto);
-		Task ManageOfficeAttendanceAsync(OfficeAttendanceDTO officeAttendanceDto);
-	}
+    public interface IEventService
+    {
+        Task<IEnumerable<EventDTO>> GetEventsAsync();
+        Task<EventDTO> GetEventByIdAsync(int eventId);
+        Task<EventDTO> CreateEventAsync(EventCreateDTO eventCreateDTO);
+        Task<EventDTO> UpdateEventAsync(int eventId, EventUpdateDTO eventUpdateDTO);
+        Task DeleteEventAsync(int eventId);
+        Task<UserAccountDTO> GetUserAccountAsync(int userId);
+        Task<UserAccountDTO> UpdateUserAccountAsync(int userId, UserAccountDTO userAccountDTO);
+        Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto); // New method added
+        Task<bool> CheckEventAvailabilityAsync(int eventId, AttendEventDTO attendEventDto);
+        Task<IEnumerable<AttendeeDTO>> GetEventAttendeesAsync(int eventId);
+        Task RemoveEventAttendanceAsync(int eventId, int Id);
+        Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO);
+        Task ManageOfficeAttendanceAsync(OfficeAttendanceDTO officeAttendanceDto);
+    }
 }
