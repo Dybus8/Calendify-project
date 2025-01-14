@@ -25,27 +25,40 @@ namespace StarterKit.Repositories
             return await _context.UserAccounts.ToListAsync();
         }
 
-
         public async Task<UserAccount> GetUserByIdAsync(int value)
         {
-            var user = await _context.UserAccounts
-                .FirstOrDefaultAsync(u => u.Id == value);
-            if (user == null)
+            try
             {
-                throw new KeyNotFoundException($"User with id '{value}' not found.");
+                var user = await _context.UserAccounts
+                    .FirstOrDefaultAsync(u => u.Id == value);
+                if (user == null)
+                {
+                    throw new KeyNotFoundException($"User with id '{value}' not found.");
+                }
+                return user;
             }
-            return user;
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving the user.", ex);
+            }
         }
 
         public async Task<UserAccount> GetUserByUsernameAsync(string username)
         {
-            var user = await _context.UserAccounts
-                .FirstOrDefaultAsync(u => u.UserName == username);
-            if (user == null)
+            try
             {
-                throw new KeyNotFoundException($"User with username '{username}' not found.");
+                var user = await _context.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+                if (user == null)
+                {
+                    throw new KeyNotFoundException($"User with username '{username}' not found.");
+                }
+                return user;
             }
-            return user;
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving the user.", ex);
+            }
         }
 
         public async Task RegisterUserAsync(UserAccount newUser)
