@@ -19,6 +19,7 @@ interface EventFormData {
   date: string;
   startTime: string;
   endTime: string;
+  points: string;
   location: string;
 }
 
@@ -139,6 +140,7 @@ const AdminDashboard = () => {
           description: formData.get('description') as string,
           date: formData.get('date') as string,
           startTime: formData.get('startTime') as string,
+          points: formData.get('points') as string,
           endTime: formData.get('endTime') as string,
           location: formData.get('location') as string,
         };
@@ -150,6 +152,7 @@ const AdminDashboard = () => {
         <input type="time" name="startTime" required />
         <input type="time" name="endTime" required />
         <input type="text" name="location" placeholder="Location" required />
+        <input type="text" name="points" placeholder="Points" required />
         <button type="submit">Create Event</button>
       </form>
     </div>
