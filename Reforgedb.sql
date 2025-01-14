@@ -28,3 +28,9 @@ DROP TABLE UserAccounts;
 
 -- Step 5: Rename the new table to UserAccounts
 ALTER TABLE UserAccounts_temp RENAME TO UserAccounts;
+
+-- Add a "Points" column to the "Events" table
+ALTER TABLE Events ADD COLUMN Points INTEGER DEFAULT 0;
+
+-- Add a "UserPoints" column to the "UserAccounts" table
+ALTER TABLE UserAccounts ADD COLUMN UserPoints INTEGER DEFAULT 0;
