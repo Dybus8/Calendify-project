@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using StarterKit.Models;
 using StarterKit.Models.DTOs;
-using StarterKit.Repositories; 
+using StarterKit.Repositories;
 using StarterKit.Utils;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
+using CalendifyProject.Repositories;
 
 namespace StarterKit.Controllers
 {
@@ -15,10 +16,11 @@ namespace StarterKit.Controllers
 	{
 		private readonly IAttendanceRepository _attendanceRepository;
 		private readonly IUserRepository _userRepository;
+		private readonly IEventRepository _eventRepository;
 
-		// Constructor to initialize the repositories
-		public AttendanceController(IAttendanceRepository attendanceRepository, IUserRepository userRepository)
+		public AttendanceController(IAttendanceRepository attendanceRepository, IUserRepository userRepository, IEventRepository eventRepository)
 		{
+			_eventRepository = eventRepository;
 			_attendanceRepository = attendanceRepository;
 			_userRepository = userRepository;
 		}
@@ -56,6 +58,53 @@ namespace StarterKit.Controllers
 			attendance.User.Id = userId;
 			await _attendanceRepository.AddAttendanceAsync(attendance);
 			return Ok("Attendance booked successfully.");
+		}
+
+		// Endpoint to attend an event
+		[Authorize]
+		[HttpPost("{eventId}/attend")]
+		public async Task<IActionResult> AttendEvent(int eventId)
+		{
+			// Get the logged-in user's ID from the claims
+			var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userIdClaim == null)
+			{
+				return Unauthorized("User not logged in.");
+			}
+			int userId;
+			if (!int.TryParse(userIdClaim, out userId))
+			{
+				return BadRequest("Invalid user ID.");
+			}
+
+			// Get the user from the repository
+			var user = await _userRepository.GetUserByIdAsync(userId);
+			if (user == null)
+			{
+				return NotFound("User not found.");
+			}
+
+			 // Get the event from the repository
+			if (!Guid.TryParse(eventId.ToString(), out Guid eventGuid))
+			{
+				return BadRequest("Invalid event ID.");
+			}
+			var eventEntity = await _eventRepository.GetEventByIdAsync(eventGuid);
+			if (eventEntity == null)
+			{
+				return NotFound("Event not found.");
+			}
+
+			// Create a new event attendance record
+			var eventAttendance = new Event_Attendance
+			{
+				UserAccount = user,
+				Event = eventEntity,
+				Feedback = "",
+				EventId = eventId
+			};
+			await _attendanceRepository.AddAttendanceAsync(eventAttendance);
+			return Ok("Event attendance recorded successfully.");
 		}
 
 		// Endpoint to update attendance

@@ -2,7 +2,7 @@ namespace StarterKit.Models
 {
     public class Event
     {
-        public int EventId { get; set; }
+        public int EventId { get; set; } // Changed from GUID to int
 
         public required string Title { get; set; }
 

@@ -50,13 +50,12 @@ const UserDashboard = () => {
 
   const handleAttendEvent = async (eventId: number) => {
     try {
-      const response = await fetch(`/api/{eventId}/attend`, {
+      const response = await fetch(`/api/attendance/${eventId}/attend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ eventId }),
       });
   
       if (!response.ok) {
@@ -66,7 +65,7 @@ const UserDashboard = () => {
         }
         const errorText = await response.text();
         console.error('Error response:', errorText);
-        throw new Error('Failed to attend event bdshfbsfjjkfk');
+        throw new Error('Failed to attend event');
       }
   
       const updatedEvent = await response.json();
@@ -96,9 +95,12 @@ const UserDashboard = () => {
         {events.map(event => (
           <div key={event.id} className="event-card">
             <h3>{event.title}</h3>
+            <p>{event.description}</p>
             <p>Date: {event.date}</p>
+            <p>Time: {event.startTime} - {event.endTime}</p>
+            <p>Location: {event.location}</p>
             <button onClick={() => navigate(`/event_details/${event.id}`)}>View Details</button>
-            {/* <button onClick={() => handleAttendEvent(event.id)}><b>Attend Event</b></button> */}
+            <button onClick={() => handleAttendEvent(event.id)}>Attend Event</button>
           </div>
         ))}
       </div>

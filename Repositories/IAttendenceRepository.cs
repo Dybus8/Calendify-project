@@ -13,5 +13,6 @@ namespace StarterKit.Repositories
 		Task<Attendance> GetAttendanceByDateAndUserIdAsync(DateTime date, int userId);
 
 		Task DeleteAttendanceAsync(int id);
-	}
+        Task AddAttendanceAsync(Event_Attendance eventAttendance);
+    }
 }
