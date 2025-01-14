@@ -191,34 +191,29 @@ namespace StarterKit.Services
             }
         }
 
-        public async Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto)
+        public async Task<EventDTO> AttendEventAsync(int eventId, int userId)
         {
             try 
             {
-                var userSession = await _loginService.GetCurrentUserSessionInfoAsync()
-                    ?? throw new UserNotAuthorizedException("User must be logged in to attend an event");
-
-                var @event = await _context.Events.FindAsync(attendEventDto.EventId)
-                    ?? throw new EventNotFoundException(attendEventDto.EventId);
+                var @event = await _context.Events.FindAsync(eventId)
+                    ?? throw new EventNotFoundException(eventId);
 
                 if (@event.EventDate.Date < DateTime.Today.Date)
                     throw new EventAttendanceException("Cannot attend past events");
 
                 var existingAttendance = await _context.EventAttendances
-                    .FirstOrDefaultAsync(ea => 
-                        ea.EventId == attendEventDto.EventId && 
-                        ea.UserAccount.Id == userSession.UserId);
+                    .FirstOrDefaultAsync(ea => ea.EventId == eventId && ea.UserAccount.Id == userId);
 
                 if (existingAttendance != null)
                     throw new EventAttendanceException("User is already attending this event");
 
-                var userAccount = await _context.UserAccounts.FindAsync(userSession.UserId)
+                var userAccount = await _context.UserAccounts.FindAsync(userId)
                     ?? throw new KeyNotFoundException("User not found");
 
                 var eventAttendance = new Event_Attendance
                 {
-                    EventId = attendEventDto.EventId,
-                    Id = userSession.UserId,
+                    EventId = eventId,
+                    Id = userId,
                     UserAccount = userAccount,
                     Event = @event,
                     Feedback = "",
@@ -228,9 +223,9 @@ namespace StarterKit.Services
                 _context.EventAttendances.Add(eventAttendance);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"User {userSession.UserId} attended event {attendEventDto.EventId}");
+                _logger.LogInformation($"User {userId} attended event {eventId}");
 
-                return await GetEventByIdAsync(attendEventDto.EventId);
+                return await GetEventByIdAsync(eventId);
             }
             catch (Exception ex)
             {
@@ -336,6 +331,49 @@ namespace StarterKit.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error creating review for event {eventId}");
+                throw;
+            }
+        }
+
+        public async Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto)
+        {
+            try
+            {
+                var @event = await _context.Events.FindAsync(attendEventDto.EventId)
+                    ?? throw new EventNotFoundException(attendEventDto.EventId);
+
+                if (@event.EventDate.Date < DateTime.Today.Date)
+                    throw new EventAttendanceException("Cannot attend past events");
+
+                var existingAttendance = await _context.EventAttendances
+                    .FirstOrDefaultAsync(ea => ea.EventId == attendEventDto.EventId && ea.UserAccount.Id == attendEventDto.UserId);
+
+                if (existingAttendance != null)
+                    throw new EventAttendanceException("User is already attending this event");
+
+                var userAccount = await _context.UserAccounts.FindAsync(attendEventDto.UserId)
+                    ?? throw new KeyNotFoundException("User not found");
+
+                var eventAttendance = new Event_Attendance
+                {
+                    EventId = attendEventDto.EventId,
+                    Id = attendEventDto.UserId,
+                    UserAccount = userAccount,
+                    Event = @event,
+                    Feedback = "",
+                    Rating = 0
+                };
+
+                _context.EventAttendances.Add(eventAttendance);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"User {attendEventDto.UserId} attended event {attendEventDto.EventId}");
+
+                return await GetEventByIdAsync(attendEventDto.EventId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error attending event");
                 throw;
             }
         }

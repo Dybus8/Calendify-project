@@ -13,6 +13,7 @@ namespace StarterKit.Services
         Task<EventDTO> UpdateEventAsync(int eventId, EventUpdateDTO eventUpdateDTO);
         Task DeleteEventAsync(int eventId);
         Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto);
+        Task<EventDTO> AttendEventAsync(int eventId, int userId);
         Task<IEnumerable<AttendeeDTO>> GetEventAttendeesAsync(int eventId);
         Task RemoveEventAttendanceAsync(int eventId, int Id);
         Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO);

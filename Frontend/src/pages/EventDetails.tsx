@@ -76,16 +76,24 @@ const EventDetails = () => {
     }
 
     try {
+
+      console.log(`Attending event with ID: ${event.id}`); // Log event ID
+
       const response = await fetch(`/api/events/${event.id}/attend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ eventId: event.id }),
-      });
+      }
+    );
 
       if (!response.ok) {
-        throw new Error('Failed to attend event');
+        if (response.status === 500) {
+          setError('Server error occurred. Please try again later.');
+        } else {
+          setError('Failed to attend event');
+        }
+        return;
       }
 
       const updatedEvent = await response.json();

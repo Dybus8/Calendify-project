@@ -103,18 +103,26 @@ namespace StarterKit.Controllers
 
         [Authorize]
         [HttpPost("{eventId}/attend")]
-        public async Task<ActionResult<EventDTO>> AttendEvent(int eventId, [FromBody] AttendEventDTO attendEventDto)
+        public async Task<ActionResult<EventDTO>> AttendEvent(int eventId)
         {
             try
             {
+                var user = HttpContext.User;
+                var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { message = "User ID claim not found." });
+                }
+                var userId = int.Parse(userIdClaim.Value);
+
                 // Check event availability before allowing attendance
-                var isAvailable = await _eventService.CheckEventAvailabilityAsync(eventId, attendEventDto);
+                var isAvailable = await _eventService.CheckEventAvailabilityAsync(eventId, new AttendEventDTO { EventId = eventId });
                 if (!isAvailable)
                 {
                     return BadRequest(new { message = "Event is not available for attendance." });
                 }
 
-                var updatedEvent = await _eventService.AttendEventAsync(attendEventDto);
+                var updatedEvent = await _eventService.AttendEventAsync(eventId, userId);
                 return Ok(updatedEvent);
             }
             catch (UnauthorizedAccessException ex)
@@ -149,10 +157,15 @@ namespace StarterKit.Controllers
             try
             {
                 var user = HttpContext.User;
-                var userId = int.Parse(user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+                var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { message = "User ID claim not found." });
+                }
+                var userId = int.Parse(userIdClaim.Value);
                 
                 await _eventService.RemoveEventAttendanceAsync(eventId, userId);
-                return NoContent();
+                return Created("", new { message = "Attendance successfully." });
             }
             catch (Exception ex)
             {
