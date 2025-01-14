@@ -75,36 +75,7 @@ const EventDetails = () => {
       return;
     }
 
-    try {
-
-      console.log(`Attending event with ID: ${event.id}`); // Log event ID
-
-      const response = await fetch(`/api/events/${event.id}/attend`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-      if (!response.ok) {
-        if (response.status === 500) {
-          setError('Server error occurred. Please try again later.');
-        } else {
-          setError('Failed to attend event');
-        }
-        return;
-      }
-
-      const updatedEvent = await response.json();
-      setEvent(updatedEvent);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
-    }
+    navigate(`/events/${event.id}/attend`);
   };
 
   if (loading) {
@@ -133,7 +104,7 @@ const EventDetails = () => {
           <p>Date: {event.date}</p>
           <p>Time: {event.startTime} - {event.endTime}</p>
           <p>Location: {event.location}</p>
-          <button onClick={handleAttendEvent}>Attend Event</button>
+          <button onClick={() => navigate ("/events/${eventId}/attend")}>Attend Event</button>
         </div>
       </div>
     </div>
