@@ -50,18 +50,25 @@ const UserDashboard = () => {
 
   const handleAttendEvent = async (eventId: number) => {
     try {
-      const response = await fetch(`/api/events/${eventId}/attend`, {
+      const response = await fetch(`/api/{eventId}/attend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ eventId }),
       });
-
+  
       if (!response.ok) {
-        throw new Error('Failed to attend event');
+        if (response.status === 405) {
+          const allowHeader = response.headers.get('Allow');
+          console.error('Allow header:', allowHeader);
+        }
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error('Failed to attend event bdshfbsfjjkfk');
       }
-
+  
       const updatedEvent = await response.json();
       setEvents(events.map(event => (event.id === updatedEvent.id ? updatedEvent : event)));
     } catch (err) {
