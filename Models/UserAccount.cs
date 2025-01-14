@@ -7,6 +7,7 @@ namespace StarterKit.Models
         public required string Password { get; set; }
         public required string Email { get; set; }
         public required bool IsAdmin { get; set; } // New property to differentiate
+        public int UserPoints { get; set; }
 
         // User-specific properties
         public required string FirstName { get; set; }
