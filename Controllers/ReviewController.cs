@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StarterKit.Models;
+using StarterKit.Models.DTOs;  // Add this line
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,12 +24,12 @@ namespace StarterKit.Controllers
         {
             var reviews = _context.Reviews
                 .Where(r => r.EventId == eventId)
-                .Select(r => new
+                .Select(r => new ReviewDTO
                 {
-                    r.Id,
-                    r.Rating,
-                    r.Comment,
-                    r.CreatedDate,
+                    Id = r.Id,
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    CreatedDate = r.CreatedDate,
                     UserName = r.User.UserName
                 })
                 .OrderByDescending(r => r.CreatedDate)
@@ -38,17 +40,48 @@ namespace StarterKit.Controllers
 
         // POST: api/reviews
         [HttpPost]
-        public async Task<IActionResult> AddReview([FromBody] Review review)
+        public async Task<IActionResult> AddReview([FromBody] ReviewCreateRequestDTO reviewDto)
         {
-            if (review.Rating < 1 || review.Rating > 10)
+            if (reviewDto.Rating < 1 || reviewDto.Rating > 10)
             {
                 return BadRequest("Rating must be between 1 and 10.");
             }
 
+            var user = await _context.UserAccounts.FindAsync(reviewDto.UserId);
+            var event_ = await _context.Events.FindAsync(reviewDto.EventId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (event_ == null)
+            {
+                return NotFound("Event not found");
+            }
+
+            var review = new Review
+            {
+                EventId = reviewDto.EventId,
+                UserId = reviewDto.UserId,
+                Rating = reviewDto.Rating,
+                Comment = reviewDto.Comment,
+                CreatedDate = DateTime.UtcNow
+            };
+
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetReviewsByEvent), new { eventId = review.EventId }, review);
+            var responseDto = new ReviewDTO
+            {
+                Id = review.Id,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreatedDate = review.CreatedDate,
+                UserName = user.UserName
+            };
+
+            return CreatedAtAction(nameof(GetReviewsByEvent), new { eventId = review.EventId }, responseDto);
         }
     }
 }
