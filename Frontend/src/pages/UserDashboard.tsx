@@ -90,7 +90,8 @@ const UserDashboard = () => {
           <div key={event.id} className="event-card">
             <h3>{event.title}</h3>
             <p>Date: {event.date}</p>
-            <button onClick={() => handleAttendEvent(event.id)}><b>*!! PUT DESCRIPTION HERE !!*</b></button>
+            <button onClick={() => navigate(`/event_details/${event.id}`)}>View Details</button>
+            {/* <button onClick={() => handleAttendEvent(event.id)}><b>Attend Event</b></button> */}
           </div>
         ))}
       </div>
