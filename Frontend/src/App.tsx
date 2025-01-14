@@ -7,6 +7,7 @@ import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import { useAuth } from './context/AuthContext';
 import EventDetails from './pages/EventDetails';
+import AttendEvent from './pages/AttendEvent';
 
 function App() {
   const { user } = useAuth();
@@ -39,6 +40,16 @@ function App() {
             ) : (
               <EventDetails />
             ))
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/events/:eventId/attend"
+        element={
+          user ? (
+            <AttendEvent />
           ) : (
             <Navigate to="/login" />
           )
