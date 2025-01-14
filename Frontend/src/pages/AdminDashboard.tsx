@@ -112,6 +112,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+      <div className="top-buttons-admin-dashboard">
+        <button onClick={() => navigate('/logout')}>Logout</button>
+      </div>
       <h1>Admin Dashboard</h1>
       <h2>Events</h2>
       <div className="events-list">

@@ -50,25 +50,18 @@ const UserDashboard = () => {
 
   const handleAttendEvent = async (eventId: number) => {
     try {
-      const response = await fetch(`/api/{eventId}/attend`, {
+      const response = await fetch(`/api/events/${eventId}/attend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ eventId }),
       });
-  
+
       if (!response.ok) {
-        if (response.status === 405) {
-          const allowHeader = response.headers.get('Allow');
-          console.error('Allow header:', allowHeader);
-        }
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error('Failed to attend event bdshfbsfjjkfk');
+        throw new Error('Failed to attend event');
       }
-  
+
       const updatedEvent = await response.json();
       setEvents(events.map(event => (event.id === updatedEvent.id ? updatedEvent : event)));
     } catch (err) {
@@ -90,6 +83,9 @@ const UserDashboard = () => {
 
   return (
     <div className="user-dashboard">
+      <div className="top-buttons-user-dashboard">
+        <button onClick={() => navigate('/logout')}>Logout</button>
+      </div>
       <h1>User Dashboard</h1>
       <h2>Events</h2>
       <div className="event-card-container">
@@ -97,7 +93,12 @@ const UserDashboard = () => {
           <div key={event.id} className="event-card">
             <h3>{event.title}</h3>
             <p>Date: {event.date}</p>
-            <button onClick={() => navigate(`/event_details/${event.id}`)}>View Details</button>
+            <button onClick={() => {
+              console.log(`Navigating to event details for event ID: ${event.id}`); // Log event ID
+              navigate(`/event_details/${event.id}`);
+            }}>
+              View Details
+            </button>
             {/* <button onClick={() => handleAttendEvent(event.id)}><b>Attend Event</b></button> */}
           </div>
         ))}

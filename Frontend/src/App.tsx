@@ -31,7 +31,7 @@ function App() {
         }
       />
       <Route
-        path="/event_details/:id"
+        path="/event_details/:eventId"
         element={
           user ? (
             (console.log('User role:', user.isAdmin), user.isAdmin ? (

@@ -51,6 +51,19 @@
 }
 
 
+.top-buttons-user-dashboard {
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: flex;
+    justify-content: right;
+    align-self: flex-start;
+}
+
+
 .dashboard-actions {
     display: flex;
     justify-content: space-between;

@@ -17,7 +17,7 @@ interface Event {
 const EventDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { eventId } = useParams<{ eventId: string }>();
+  const { eventId } = useParams<{ eventId: string }>(); // Ensure eventId is extracted
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +25,12 @@ const EventDetails = () => {
   useEffect(() => {
     if (!user) {
       navigate('/login');
+      return;
+    }
+
+    if (!eventId) {
+      setError('Event ID is missing');
+      setLoading(false);
       return;
     }
 
@@ -107,6 +113,10 @@ const EventDetails = () => {
 
   return (
     <div className="event-details-page">
+      <div className="top-buttons-details">
+        <button onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
+        <button onClick={() => navigate('/logout')}>Logout</button>
+      </div>
       <h1>Event details</h1>
       <div className="event-details-container">
         <div className="event-details">
