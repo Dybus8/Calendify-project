@@ -92,15 +92,13 @@ const UserDashboard = () => {
     <div className="user-dashboard">
       <h1>User Dashboard</h1>
       <h2>Events</h2>
-      <div className="events-list">
+      <div className="event-card-container">
         {events.map(event => (
           <div key={event.id} className="event-card">
             <h3>{event.title}</h3>
-            <p>{event.description}</p>
             <p>Date: {event.date}</p>
-            <p>Time: {event.startTime} - {event.endTime}</p>
-            <p>Location: {event.location}</p>
-            <button onClick={() => handleAttendEvent(event.id)}>Attend Event</button>
+            <button onClick={() => navigate(`/event_details/${event.id}`)}>View Details</button>
+            {/* <button onClick={() => handleAttendEvent(event.id)}><b>Attend Event</b></button> */}
           </div>
         ))}
       </div>

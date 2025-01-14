@@ -47,18 +47,10 @@ namespace StarterKit.Controllers
 				return NotFound("User not found.");
 			}
 
-			 // Check if the event exists
-			var eventEntity = await _attendanceRepository.GetEventByIdAsync(attendanceDto.EventId);
-			if (eventEntity == null)
-			{
-				return NotFound("Event not found.");
-			}
-
 			// Create a new attendance record
 			var attendance = new Attendance
 			{
 				User = user,
-				Event = eventEntity,
 				AttendanceDate = attendanceDto.Date,
 			};
 			attendance.User.Id = userId;
@@ -107,7 +99,7 @@ namespace StarterKit.Controllers
 			var attendance = await _attendanceRepository.GetAttendanceByDateAndUserIdAsync(attendanceDto.Date, int.Parse(userId));
 			if (attendance == null)
 			{
-				return NotFound("You're not attending this .");
+				return NotFound("You're not attending this.");
 			}
 
 			// Remove the attendance record
