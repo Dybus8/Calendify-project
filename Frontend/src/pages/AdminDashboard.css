@@ -34,6 +34,22 @@
     text-align: left;
 }
 
+
+.top-buttons-admin-dashboard {
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: flex;
+    justify-content: right;
+    align-self: flex-start;
+    order: 1;
+}
+
+
+
 .btn {
     margin: 0 5px;
     padding: 5px 10px;
