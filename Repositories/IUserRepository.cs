@@ -10,6 +10,7 @@ namespace StarterKit.Repositories
         Task<UserAccount> GetUserByIdAsync(int value);
         Task<UserAccount> GetUserByUsernameAsync(string username);
         Task RegisterUserAsync(UserAccount newUser);
+        Task<bool> UserNameExistsAsync(string username);
         // Other user-related methods...
     }
 }

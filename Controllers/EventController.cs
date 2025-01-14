@@ -149,13 +149,8 @@ namespace StarterKit.Controllers
             try
             {
                 var user = HttpContext.User;
-                var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
-                {
-                    return Unauthorized(new { message = "User not logged in" });
-                }
-
-                var userId = int.Parse(userIdClaim.Value);
+                var userId = int.Parse(user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+                
                 await _eventService.RemoveEventAttendanceAsync(eventId, userId);
                 return NoContent();
             }

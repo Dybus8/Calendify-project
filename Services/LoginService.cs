@@ -30,7 +30,7 @@ namespace StarterKit.Services
                 if (string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
                 {
                     _logger.LogWarning("Login attempt with empty username or password");
-                    return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidCredentials };
+                    return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidPassword };
                 }
 
                 var user = await _userRepository.GetUserByUsernameAsync(loginDto.Username);
@@ -42,7 +42,7 @@ namespace StarterKit.Services
 
                 if (!EncryptionHelper.VerifyPassword(loginDto.Password, user.Password))
                 {
-                    _logger.LogWarning("Invalid password for user: {Username}", loginDto.Username);
+                    _logger.LogWarning("Invalid password for user: {Username", loginDto.Username);
                     return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidPassword };
                 }
 
@@ -57,19 +57,20 @@ namespace StarterKit.Services
             }
         }
 
-        private void SetUserSession(UserAccount userAccount)
+private void SetUserSession(UserAccount userAccount)
         {
             var session = _httpContextAccessor.HttpContext?.Session;
             if (session == null) return;
 
-            session.SetInt32("UserId", userAccount.Id); // Ensure Id is set correctly
-            session.SetString("Email", userAccount.Email ?? string.Empty);
-            session.SetString("FirstName", userAccount.FirstName ?? string.Empty);
-            session.SetString("LastName", userAccount.LastName ?? string.Empty);
+            session.SetInt32("UserId", userAccount.Id);
+            session.SetString("Email", userAccount.Email);
+            session.SetString("FirstName", userAccount.FirstName);
+            session.SetString("LastName", userAccount.LastName);
             session.SetString("Role", userAccount.IsAdmin ? "Admin" : "User");
 
             _logger.LogInformation("Session set for user: {Username}, Role: {Role}", userAccount.UserName, userAccount.IsAdmin ? "Admin" : "User");
         }
+
 
         public async Task<UserAccount> RegisterUser(UserRegistrationDTO registrationDto)
         {
@@ -87,10 +88,10 @@ namespace StarterKit.Services
             var newUser = new UserAccount
             {
                 UserName = registrationDto.UserName,
-                FirstName = registrationDto.FirstName ?? string.Empty,
-                LastName = registrationDto.LastName ?? string.Empty,
-                Email = registrationDto.Email ?? string.Empty,
-                Password = EncryptionHelper.EncryptPassword(registrationDto.Password ?? string.Empty),
+                FirstName = registrationDto.FirstName,
+                LastName = registrationDto.LastName,
+                Email = registrationDto.Email,
+                Password = EncryptionHelper.EncryptPassword(registrationDto.Password),
                 IsAdmin = false,
                 RecuringDays = "",
                 Attendances = new List<Attendance>(),
@@ -138,6 +139,7 @@ namespace StarterKit.Services
             _logger.LogInformation("IsLoggedIn check - Role: {Role}", role);
             return role != null;
         }
+
 
         public bool IsAdmin()
         {

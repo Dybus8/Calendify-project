@@ -21,6 +21,11 @@ namespace StarterKit.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] UserRegistrationDTO userRegistrationDto)
         {
+            if (await _userRepository.UserNameExistsAsync(userRegistrationDto.UserName))
+            {
+                return Conflict(new { message = "Username already exists" });
+            }
+
             var newUser = new UserAccount
             {
                 UserName = userRegistrationDto.UserName,

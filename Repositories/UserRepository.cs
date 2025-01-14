@@ -54,6 +54,11 @@ namespace StarterKit.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> UserNameExistsAsync(string username)
+        {
+            return await _context.UserAccounts.AnyAsync(u => u.UserName == username);
+        }
+
         Task<UserAccount> IUserRepository.GetUserByIdAsync(int value)
         {
             return GetUserByIdAsync(value);
