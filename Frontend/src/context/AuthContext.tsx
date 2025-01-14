@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import axios from 'axios';
 
 interface User {
   id: number;
@@ -8,36 +9,38 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  login: () => {},
-  logout: () => {},
-});
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (userData: User) => {
-    console.log('Logging in user:', userData); // Added logging
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = async (username: string, password: string) => {
+    try {
+      console.log('Sending login request with:', { username, password });
+      const response = await axios.post('/api/login', { username, password });
+      console.log('API Response:', response.data);
+      setUser(response.data.user);
+      console.log('Logging in user:', response.data.user);
+    } catch (error) {
+      console.error('Login failed:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Response data:', error.response.data);
+      }
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    // Add any additional logout logic here
   };
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
@@ -46,4 +49,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
