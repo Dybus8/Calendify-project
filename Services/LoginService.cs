@@ -30,7 +30,7 @@ namespace StarterKit.Services
                 if (string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
                 {
                     _logger.LogWarning("Login attempt with empty username or password");
-                    return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidPassword };
+                    return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidCredentials };
                 }
 
                 var user = await _userRepository.GetUserByUsernameAsync(loginDto.Username);
@@ -42,7 +42,7 @@ namespace StarterKit.Services
 
                 if (!EncryptionHelper.VerifyPassword(loginDto.Password, user.Password))
                 {
-                    _logger.LogWarning("Invalid password for user: {Username", loginDto.Username);
+                    _logger.LogWarning("Invalid password for user: {Username}", loginDto.Username);
                     return new UserLoginResultDTO { Status = StarterKit.Utils.LoginStatus.InvalidPassword };
                 }
 
@@ -57,7 +57,7 @@ namespace StarterKit.Services
             }
         }
 
-private void SetUserSession(UserAccount userAccount)
+        private void SetUserSession(UserAccount userAccount)
         {
             var session = _httpContextAccessor.HttpContext?.Session;
             if (session == null) return;
@@ -70,7 +70,6 @@ private void SetUserSession(UserAccount userAccount)
 
             _logger.LogInformation("Session set for user: {Username}, Role: {Role}", userAccount.UserName, userAccount.IsAdmin ? "Admin" : "User");
         }
-
 
         public async Task<UserAccount> RegisterUser(UserRegistrationDTO registrationDto)
         {
@@ -139,7 +138,6 @@ private void SetUserSession(UserAccount userAccount)
             _logger.LogInformation("IsLoggedIn check - Role: {Role}", role);
             return role != null;
         }
-
 
         public bool IsAdmin()
         {
