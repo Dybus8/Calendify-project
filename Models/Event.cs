@@ -1,26 +1,27 @@
 namespace StarterKit.Models
 {
-    public class Event
-    {
-        public int EventId { get; set; }
+	public class Event
+	{
+		public int EventId { get; set; }
 
-        public required string Title { get; set; }
+		public required string Title { get; set; }
 
-        public required string Description { get; set; }
+		public required string Description { get; set; }
 
-        public DateTime EventDate { get; set; }
+		public DateTime EventDate { get; set; }
 
-        public TimeSpan StartTime { get; set; }
+		public TimeSpan StartTime { get; set; }
 
-        public TimeSpan EndTime { get; set; }
+		public TimeSpan EndTime { get; set; }
 
-        public required string Location { get; set; }
+		public required string Location { get; set; }
 
-        public bool AdminApproval { get; set; }
+		public bool AdminApproval { get; set; }
 
-        public required List<Event_Attendance> Event_Attendances { get; set; }
+		public required List<Event_Attendance> Event_Attendances { get; set; }
+		public required int Points { get; set; }
 
-        // New Property for Reviews
-        public ICollection<Review> Reviews { get; set; } = new List<Review>();
-    }
+		// New Property for Reviews
+		public ICollection<Review> Reviews { get; set; } = new List<Review>();
+	}
 }
