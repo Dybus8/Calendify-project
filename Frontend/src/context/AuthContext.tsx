@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import axios from 'axios'; // Import axios
 import { loginUser } from '../services/AuthService';
 
 // Configure axios with base URL
-axios.defaults.baseURL = 'http://localhost:3001'; // Adjust this port to match your backend
+axios.defaults.baseURL = 'http://localhost:3000'; // Adjust this port to match your backend
 
 interface User {
   id: number;
@@ -27,9 +28,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (userName: string, password: string) => {  // Changed username to userName
     try {
-      console.log('Sending login request with:', { username, password });
+      console.log('Sending login request with:', { userName, password });
       const response = await axios.post('http://localhost:3000/api/login', { 
-        username, 
+        userName, 
         password 
       }, {
         headers: {
@@ -73,5 +74,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-//Help 

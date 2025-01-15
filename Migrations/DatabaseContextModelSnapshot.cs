@@ -36,16 +36,13 @@ namespace StarterKit.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Attendances");
+                    b.ToTable("Attendance");
                 });
 
             modelBuilder.Entity("StarterKit.Models.Event", b =>
                 {
                     b.Property<int>("EventId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("AdminApproval")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
@@ -62,10 +59,11 @@ namespace StarterKit.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("MaxAttendees")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Points")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
+                        .HasColumnType("INTEGER");
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("TEXT");
@@ -77,68 +75,39 @@ namespace StarterKit.Migrations
                     b.HasKey("EventId");
 
                     b.ToTable("Events");
-
-                    b.HasData(
-                        new
-                        {
-                            EventId = 1,
-                            AdminApproval = true,
-                            Description = "Description for Event One",
-                            EndTime = new TimeSpan(0, 12, 0, 0, 0),
-                            EventDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Location One",
-                            Points = 0,
-                            StartTime = new TimeSpan(0, 10, 0, 0, 0),
-                            Title = "Event One"
-                        },
-                        new
-                        {
-                            EventId = 2,
-                            AdminApproval = true,
-                            Description = "Description for Event Two",
-                            EndTime = new TimeSpan(0, 16, 0, 0, 0),
-                            EventDate = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Location = "Location Two",
-                            Points = 0,
-                            StartTime = new TimeSpan(0, 14, 0, 0, 0),
-                            Title = "Event Two"
-                        });
                 });
 
             modelBuilder.Entity("StarterKit.Models.Event_Attendance", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("Event_AttendanceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("AttendanceDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("EventId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Event_AttendanceId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Feedback")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Points")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
-
-                    b.Property<int>("Rating")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("UserAccountId")
+                    b.Property<int?>("UserAccountId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Id");
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Event_AttendanceId");
 
                     b.HasIndex("EventId");
 
                     b.HasIndex("UserAccountId");
 
-                    b.ToTable("EventAttendances");
+                    b.ToTable("Event_Attendances");
                 });
 
             modelBuilder.Entity("StarterKit.Models.Review", b =>
@@ -157,11 +126,7 @@ namespace StarterKit.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Rating")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0)
-                        .HasAnnotation("MaxValue", 10)
-                        .HasAnnotation("MinValue", 1);
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
@@ -201,9 +166,7 @@ namespace StarterKit.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Points")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("RecuringDays")
                         .IsRequired()
@@ -215,72 +178,7 @@ namespace StarterKit.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserName")
-                        .IsUnique();
-
                     b.ToTable("UserAccounts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin1@example.com",
-                            FirstName = "Admin",
-                            IsAdmin = true,
-                            LastName = "One",
-                            Password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
-                            Points = 0,
-                            RecuringDays = "mo,tu,we,th,fr",
-                            UserName = "admin1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "admin2@example.com",
-                            FirstName = "Admin",
-                            IsAdmin = true,
-                            LastName = "Two",
-                            Password = "5c4e1640360113f89d47d5ca41653d050e6a5f8ee6612530a351067f55aa9e5c",
-                            Points = 0,
-                            RecuringDays = "mo,tu,we,th,fr",
-                            UserName = "admin2"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "admin3@example.com",
-                            FirstName = "Admin",
-                            IsAdmin = true,
-                            LastName = "Three",
-                            Password = "936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af",
-                            Points = 0,
-                            RecuringDays = "mo,tu,we,th,fr",
-                            UserName = "admin3"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Email = "admin4@example.com",
-                            FirstName = "Admin",
-                            IsAdmin = true,
-                            LastName = "Four",
-                            Password = "925d2e9bb3679c1b9dd58ab20bb974fdc61f3ff4db5e12bb54fab0600261c7b3",
-                            Points = 0,
-                            RecuringDays = "mo,tu,we,th,fr",
-                            UserName = "admin4"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Email = "admin5@example.com",
-                            FirstName = "Admin",
-                            IsAdmin = true,
-                            LastName = "Five",
-                            Password = "45a03d81e9f63aae2d90c8dc1e996764031bf68982a86246f0119b38305de791",
-                            Points = 0,
-                            RecuringDays = "mo,tu,we,th,fr",
-                            UserName = "admin5"
-                        });
                 });
 
             modelBuilder.Entity("StarterKit.Models.Attendance", b =>
@@ -304,9 +202,7 @@ namespace StarterKit.Migrations
 
                     b.HasOne("StarterKit.Models.UserAccount", "UserAccount")
                         .WithMany("Event_Attendances")
-                        .HasForeignKey("UserAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserAccountId");
 
                     b.Navigation("Event");
 
@@ -316,7 +212,7 @@ namespace StarterKit.Migrations
             modelBuilder.Entity("StarterKit.Models.Review", b =>
                 {
                     b.HasOne("StarterKit.Models.Event", "Event")
-                        .WithMany("Reviews")
+                        .WithMany()
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -335,8 +231,6 @@ namespace StarterKit.Migrations
             modelBuilder.Entity("StarterKit.Models.Event", b =>
                 {
                     b.Navigation("Event_Attendances");
-
-                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("StarterKit.Models.UserAccount", b =>

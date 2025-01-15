@@ -140,31 +140,60 @@ namespace StarterKit.Services
             var @event = await _context.Events.FindAsync(eventId);
             if (@event == null) return false;
 
-            // Assuming there's a property for maximum attendees
+            // No longer checking MaxAttendees
             var currentAttendanceCount = await _context.Event_Attendances.CountAsync(a => a.EventId == eventId);
-            return currentAttendanceCount < @event.MaxAttendees; // Replace MaxAttendees with the actual property name
+            return currentAttendanceCount < 100; // Assuming a default capacity
         }
 
         public async Task<IEnumerable<AttendeeDTO>> GetEventAttendeesAsync(int eventId)
         {
-            // Implementation...
-            return new List<AttendeeDTO>(); // Placeholder return
+            return await _context.Event_Attendances
+                .Where(a => a.EventId == eventId)
+                .Select(a => new AttendeeDTO
+                {
+                    Id = a.UserId,
+                    UserName = a.UserAccount.UserName // Updated to use UserAccount
+                })
+                .ToListAsync();
         }
 
         public async Task RemoveEventAttendanceAsync(int eventId, int Id)
         {
-            // Implementation...
+            var attendance = await _context.Event_Attendances
+                .FirstOrDefaultAsync(a => a.EventId == eventId && a.UserId == Id);
+            if (attendance != null)
+            {
+                _context.Event_Attendances.Remove(attendance);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public async Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO)
+        public async Task<ReviewDTO> CreateReviewAsync(int eventId, StarterKit.Models.DTOs.ReviewCreateDTO reviewCreateDTO)
         {
-            // Implementation...
-            return new ReviewDTO(); // Placeholder return
+            var review = new Review
+            {
+                EventId = eventId,
+                Rating = reviewCreateDTO.Rating,
+                Comment = reviewCreateDTO.Comment,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            _context.Reviews.Add(review);
+            await _context.SaveChangesAsync();
+
+            return new ReviewDTO
+            {
+                Id = review.Id,
+                EventId = eventId, // Added EventId
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreatedDate = review.CreatedDate
+            };
         }
 
         public async Task ManageOfficeAttendanceAsync(OfficeAttendanceDTO officeAttendanceDto)
         {
-            // Implementation...
+            // Implementation for managing office attendance
         }
     }
 }

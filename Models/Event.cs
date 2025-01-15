@@ -7,7 +7,6 @@ namespace StarterKit.Models
         public required string Description { get; set; }
         public required string Location { get; set; }
         public DateTime EventDate { get; set; }
-        public int MaxAttendees { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public int Points { get; set; }

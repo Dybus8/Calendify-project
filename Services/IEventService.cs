@@ -14,11 +14,11 @@ namespace StarterKit.Services
         Task DeleteEventAsync(int eventId);
         Task<UserAccountDTO> GetUserAccountAsync(int userId);
         Task<UserAccountDTO> UpdateUserAccountAsync(int userId, UserAccountDTO userAccountDTO);
-        Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto); // New method added
+        Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto);
         Task<bool> CheckEventAvailabilityAsync(int eventId, AttendEventDTO attendEventDto);
         Task<IEnumerable<AttendeeDTO>> GetEventAttendeesAsync(int eventId);
         Task RemoveEventAttendanceAsync(int eventId, int Id);
-        Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO);
+        Task<ReviewDTO> CreateReviewAsync(int eventId, StarterKit.Models.DTOs.ReviewCreateDTO reviewCreateDTO);
         Task ManageOfficeAttendanceAsync(OfficeAttendanceDTO officeAttendanceDto);
     }
 }
