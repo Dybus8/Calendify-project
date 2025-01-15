@@ -4,145 +4,58 @@ import { useNavigate, useParams } from 'react-router-dom';
 import './EventDetails.css';
 import { submitReview, getEventReviews } from '../services/ReviewService';
 
-// Define the structure of the event details
-interface EventDetails {
-    id: number; // Added id property
-    title: string;
-    description: string;
-    location: string;
-    eventDate: string; 
-    attendeesCount: number; // Added attendeesCount property
-}
-
-interface ReviewDTO {
-  id: number;
-  rating: number;
-  comment: string;
-  createdDate: string;
-  userName: string;
-}
-
-interface NewReviewData {
-  rating: number;
-  comment: string;
-}
-
 const EventDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
-  const [event, setEvent] = useState<EventDetails | null>(null);
-  const [reviews, setReviews] = useState<ReviewDTO[]>([]);
+  const [event, setEvent] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [newReview, setNewReview] = useState<NewReviewData>({
+  const [loading, setLoading] = useState(true);
+  const [newReview, setNewReview] = useState({
     rating: 5,
     comment: ''
   });
 
+  const mockAttendees = [
+    'John Doe',
+    'Jane Smith',
+    'Alice Johnson',
+    'Bob Brown'
+  ];
+
   useEffect(() => {
     const fetchEventDetails = async () => {
-      if (!eventId) {
-          setError('Event ID is required');
-          return;
-      }
-
-      const id = parseInt(eventId, 10);
-      if (isNaN(id) || id < 1 || id > 10) {
-          setError('Invalid event ID');
-          return;
-      }
-
       try {
-          const response = await fetch(`/api/events/${id}`);
-          if (!response.ok) throw new Error('Event not found');
-          const data = await response.json();
-          setEvent(data);
+        const response = await fetch(`/api/events/${eventId}`);
+        if (!response.ok) throw new Error('Event not found');
+        const data = await response.json();
+        setEvent(data);
       } catch (err) {
-          setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
-          setLoading(false);
+        setLoading(false);
       }
     };
 
     fetchEventDetails();
   }, [eventId]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const reviewsData = await getEventReviews(eventId!);
-        setReviews(reviewsData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      }
-    };
-
-    fetchData();
-  }, [eventId]);
-
-  const handleAttendEvent = async () => {
-    if (!event) return;
-
-    const eventDate = new Date(event.eventDate);
-    if (eventDate < new Date()) {
-      setError('Cannot attend past events.');
-      return;
-    }
-
-    if (event.attendeesCount >= 100) {
-      setError('This event is at capacity.');
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/events/${event.id}/attend`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        setError('Failed to attend event');
-        return;
-      }
-
-      const updatedEvent = await response.json();
-      setEvent(updatedEvent);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-    }
-  };
-
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!event || !eventId) return;
-
     try {
-        const reviewData = {
-            rating: newReview.rating,
-            comment: newReview.comment
-        };
-        const reviewResponse = await submitReview(eventId, reviewData);
-        setReviews([...reviews, reviewResponse]);
-        setNewReview({ rating: 5, comment: '' });
+      const reviewData = { rating: newReview.rating, comment: newReview.comment };
+      const reviewResponse = await submitReview(eventId!, reviewData);
+      setReviews([...reviews, reviewResponse]);
+      setNewReview({ rating: 5, comment: '' });
     } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to submit review');
+      setError(err instanceof Error ? err.message : 'Failed to submit review');
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!event) {
-    return <div>Event not found</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!event) return <div>Event not found</div>;
 
   return (
     <div className="event-details-page">
@@ -150,15 +63,17 @@ const EventDetails = () => {
         <button onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
         <button onClick={() => navigate('/logout')}>Logout</button>
       </div>
-      <h1>Event details</h1>
+
+      <h1>Event Details</h1>
       <div className="event-details-container">
         <div className="event-details">
           <h3>{event.title}</h3>
           <p>{event.description}</p>
           <p>Date: {event.eventDate}</p>
           <p>Location: {event.location}</p>
-          <button onClick={handleAttendEvent}>Attend Event</button>
+          <button onClick={() => alert('Attend Event clicked!')}>Attend Event</button>
         </div>
+
         <div className="reviews-section">
           <h2>Reviews</h2>
           <form onSubmit={handleSubmitReview} className="review-form">
@@ -168,10 +83,7 @@ const EventDetails = () => {
               <select
                 id="rating"
                 value={newReview.rating}
-                onChange={(e) => setNewReview({
-                  ...newReview,
-                  rating: parseInt(e.target.value)
-                })}
+                onChange={(e) => setNewReview({ ...newReview, rating: parseInt(e.target.value) })}
               >
                 {[1, 2, 3, 4, 5].map(num => (
                   <option key={num} value={num}>{num}</option>
@@ -183,10 +95,7 @@ const EventDetails = () => {
               <textarea
                 id="comment"
                 value={newReview.comment}
-                onChange={(e) => setNewReview({
-                  ...newReview,
-                  comment: e.target.value
-                })}
+                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                 required
               />
             </div>
@@ -202,6 +111,15 @@ const EventDetails = () => {
           ) : (
             <p>No reviews yet.</p>
           )}
+        </div>
+
+        <div className="attendees-box">
+          <h2>Attendees</h2>
+          <ul>
+            {mockAttendees.map((attendee, index) => (
+              <li key={index}>{attendee}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

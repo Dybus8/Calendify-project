@@ -1,102 +1,113 @@
-.event-details-page h1{
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding: 2rem;
-    margin-bottom: 10px;
-    font-size: 54px;
+/* Modernized EventDetails.css */
+
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #dc3545;
+  --background-color: #f9f9f9;
+  --card-background: #ffffff;
+  --text-color: #333;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.event-details-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 20px;
+}
+
+.event-details-page h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.top-buttons-details {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .event-details-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 20px;
-    
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
 }
 
-.event-page {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 20px;
-    margin-top: 20px;
+.event-details {
+  flex: 2;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
 }
 
-
-.top-buttons-details {
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-self: flex-start;
+.reviews-section {
+  flex: 1;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
 }
 
+.attendees-box {
+  flex: 1;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+}
 
-.btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.attendees-box h2 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.attendees-box ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.attendees-box li {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  opacity: 0.9;
 }
 
 .btn-primary {
-    background-color: #007bff;
-    color: white;
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .btn-danger {
-    background-color: #dc3545;
-    color: white;
-}
-
-.review-form {
-  margin: 20px 0;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.review-form h3 {
-  margin-bottom: 15px;
-}
-
-.review-form .form-group {
-  margin-bottom: 15px;
-}
-
-.review-form label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.review-form select,
-.review-form textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.review-form textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.review-form button {
-  background-color: #007bff;
+  background-color: var(--secondary-color);
   color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.review-form button:hover {
-  background-color: #0056b3;
 }
