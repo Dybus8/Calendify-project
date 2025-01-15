@@ -105,58 +105,102 @@ const AdminDashboard = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="loading-state">Loading<span>.</span><span>.</span><span>.</span></div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="error-state">Error: {error}</div>;
   }
 
   return (
     <div className="admin-dashboard">
-      <div className="top-buttons-admin-dashboard">
-        <button onClick={() => navigate('/logout')}>Logout</button>
+      <div className="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <button className="logout-button" onClick={() => navigate('/logout')}>Logout</button>
       </div>
-      <h1>Admin Dashboard</h1>
-      <h2>Events</h2>
-      <div className="events-list">
-        {events.map(event => (
-          <div key={event.id} className="event-card">
-            <h3>{event.title}</h3>
-            <p>{event.description}</p>
-            <p>Date: {event.date}</p>
-            
-            <p>Time: {event.startTime} - {event.endTime}</p>
-            <p>Location: {event.location}</p>
-            <button onClick={() => handleDeleteEvent(event.id)}>Delete Event</button>
+      
+      <div className="dashboard-content">
+        <div className="events-section">
+          <h2>Manage Events</h2>
+          <div className="events-grid">
+            {events.map(event => (
+              <div key={event.id} className="event-card">
+                <div className="event-header">
+                  <h3>{event.title}</h3>
+                  <span className="points-badge">{event.points} points</span>
+                </div>
+                <div className="event-body">
+                  <p className="event-description">{event.description}</p>
+                  <div className="event-details">
+                    <p><i className="far fa-calendar"></i> {event.date}</p>
+                    <p><i className="far fa-clock"></i> {event.startTime} - {event.endTime}</p>
+                    <p><i className="fas fa-map-marker-alt"></i> {event.location}</p>
+                  </div>
+                </div>
+                <div className="event-actions">
+                  <button className="delete-button" onClick={() => handleDeleteEvent(event.id)}>
+                    <i className="fas fa-trash"></i> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        <div className="create-event-section">
+          <h2>Create New Event</h2>
+          <form className="event-form" onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.target as HTMLFormElement;
+            const formData = new FormData(form);
+            const eventData: EventFormData = {
+              title: formData.get('title') as string,
+              description: formData.get('description') as string,
+              date: formData.get('date') as string,
+              points: formData.get('points') as string,
+              startTime: formData.get('startTime') as string,
+              endTime: formData.get('endTime') as string,
+              location: formData.get('location') as string,
+            };
+            handleCreateEvent(eventData);
+            form.reset();
+          }}>
+            <div className="form-group">
+              <label htmlFor="title">Title</label>
+              <input id="title" type="text" name="title" required />
+            </div>
+            <div className="form-group">
+              <label htmlFor="description">Description</label>
+              <textarea id="description" name="description" required />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="date">Date</label>
+                <input id="date" type="date" name="date" required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="points">Points</label>
+                <input id="points" type="text" name="points" required />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="startTime">Start Time</label>
+                <input id="startTime" type="time" name="startTime" required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="endTime">End Time</label>
+                <input id="endTime" type="time" name="endTime" required />
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="location">Location</label>
+              <input id="location" type="text" name="location" required />
+            </div>
+            <button type="submit" className="submit-button">Create Event</button>
+          </form>
+        </div>
       </div>
-      <h2>Create New Event</h2>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        const form = e.target as HTMLFormElement;
-        const formData = new FormData(form);
-        const eventData: EventFormData = {
-          title: formData.get('title') as string,
-          description: formData.get('description') as string,
-          date: formData.get('date') as string,
-          points: formData.get('points') as string,
-          startTime: formData.get('startTime') as string,
-          endTime: formData.get('endTime') as string,
-          location: formData.get('location') as string,
-        };
-        handleCreateEvent(eventData);
-      }}>
-        <input type="text" name="title" placeholder="Title" required />
-        <textarea name="description" placeholder="Description" required />
-        <input type="date" name="date" required />
-        <input type="time" name="startTime" required />
-        <input type="time" name="endTime" required />
-        <input type="text" name="points" placeholder="Points" required />
-        <input type="text" name="location" placeholder="Location" required />
-        <button type="submit">Create Event</button>
-      </form>
     </div>
   );
 };

@@ -4,15 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import './EventDetails.css';
 import { submitReview, getEventReviews } from '../services/ReviewService';
 
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  attendeesCount: number;
+// Define the structure of the event details
+interface EventDetails {
+    title: string;
+    description: string;
+    location: string;
+    eventDate: string; 
 }
 
 interface ReviewDTO {
@@ -34,23 +31,37 @@ const EventDetails = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
   const [reviews, setReviews] = useState<ReviewDTO[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newReview, setNewReview] = useState<NewReviewData>({
     rating: 5,
     comment: ''
   });
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+            }
+
+            const id = parseInt(eventId, 10);
+            if (isNaN(id) || id < 1 || id > 10) {
+                setError('Invalid event ID');
+                return;
+            }
+
+            try {
+                const response = await axios.get(`/api/events/${id}`);
+                setEventDetails(response.data);
+            } catch (err) {
+                setError('Event not found');
+            }
+        };
+
+        fetchEventDetails();
+    }, [eventId]);
+
+    if (error) {
+        return <div>{error}</div>;
     }
 
-    if (!eventId) {
-      setError('Event ID is missing');
-      setLoading(false);
-      return;
+    if (!eventDetails) {
+        return <div>Loading...</div>;
     }
 
     const fetchData = async () => {
