@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import './EventDetails.css';
-import { submitReview, getEventReviews } from '../services/ReviewService';
+import { submitReview } from '../services/ReviewService';
+import axios from 'axios'; // Import axios for making requests
 
 const EventDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
-  const [event, setEvent] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [event, setEvent] = useState<any>(null); // Define type for event
+  const [reviews, setReviews] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [newReview, setNewReview] = useState({
@@ -17,12 +18,12 @@ const EventDetails = () => {
     comment: ''
   });
 
-  const mockAttendees = [
+  const [attendees, setAttendees] = useState<string[]>([
     'John Doe',
     'Jane Smith',
     'Alice Johnson',
     'Bob Brown'
-  ];
+  ]);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -40,6 +41,26 @@ const EventDetails = () => {
 
     fetchEventDetails();
   }, [eventId]);
+
+  const handleAttendEvent = async () => {
+    if (user) {
+      const attendeeName = `${user.firstName} ${user.lastName}`;
+      
+      // Check if the attendee is already in the list
+      if (attendees.includes(attendeeName)) {
+        alert('You are already attending this event.');
+        return;
+      }
+
+      // Update the attendees list
+      setAttendees([...attendees, attendeeName]);
+
+      // Optionally, send a request to the backend to record attendance
+      await axios.post(`/api/attendance`, { eventId, userId: user.id });
+    } else {
+      alert('You need to be logged in to attend the event.');
+    }
+  };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +92,7 @@ const EventDetails = () => {
           <p>{event.description}</p>
           <p>Date: {event.eventDate}</p>
           <p>Location: {event.location}</p>
-          <button onClick={() => alert('Attend Event clicked!')}>Attend Event</button>
+          <button onClick={handleAttendEvent}>Attend Event</button>
         </div>
 
         <div className="reviews-section">
@@ -116,7 +137,7 @@ const EventDetails = () => {
         <div className="attendees-box">
           <h2>Attendees</h2>
           <ul>
-            {mockAttendees.map((attendee, index) => (
+            {attendees.map((attendee, index) => (
               <li key={index}>{attendee}</li>
             ))}
           </ul>

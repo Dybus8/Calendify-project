@@ -9,6 +9,8 @@ interface User {
   id: number;
   userName: string;  // Changed from username to userName
   isAdmin: boolean;
+  firstName: string; // Add firstName
+  lastName: string;  // Add lastName
 }
 
 interface AuthContextType {
@@ -43,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { password: _, ...safeUserData } = userData;
       
       console.log('Login successful for:', safeUserData);
-      setUser(userData);
+      setUser(safeUserData); // Ensure safeUserData includes firstName and lastName
     } catch (error) {
       console.error('Login failed');
       if (axios.isAxiosError(error)) {
