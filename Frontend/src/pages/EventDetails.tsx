@@ -6,10 +6,12 @@ import { submitReview, getEventReviews } from '../services/ReviewService';
 
 // Define the structure of the event details
 interface EventDetails {
+    id: number; // Added id property
     title: string;
     description: string;
     location: string;
     eventDate: string; 
+    attendeesCount: number; // Added attendeesCount property
 }
 
 interface ReviewDTO {
@@ -29,66 +31,60 @@ const EventDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
-  const [event, setEvent] = useState<Event | null>(null);
+  const [event, setEvent] = useState<EventDetails | null>(null);
   const [reviews, setReviews] = useState<ReviewDTO[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [newReview, setNewReview] = useState<NewReviewData>({
     rating: 5,
     comment: ''
   });
 
-            }
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      if (!eventId) {
+          setError('Event ID is required');
+          return;
+      }
 
-            const id = parseInt(eventId, 10);
-            if (isNaN(id) || id < 1 || id > 10) {
-                setError('Invalid event ID');
-                return;
-            }
+      const id = parseInt(eventId, 10);
+      if (isNaN(id) || id < 1 || id > 10) {
+          setError('Invalid event ID');
+          return;
+      }
 
-            try {
-                const response = await axios.get(`/api/events/${id}`);
-                setEventDetails(response.data);
-            } catch (err) {
-                setError('Event not found');
-            }
-        };
+      try {
+          const response = await fetch(`/api/events/${id}`);
+          if (!response.ok) throw new Error('Event not found');
+          const data = await response.json();
+          setEvent(data);
+      } catch (err) {
+          setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
+          setLoading(false);
+      }
+    };
 
-        fetchEventDetails();
-    }, [eventId]);
+    fetchEventDetails();
+  }, [eventId]);
 
-    if (error) {
-        return <div>{error}</div>;
-    }
-
-    if (!eventDetails) {
-        return <div>Loading...</div>;
-    }
-
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch event data
-        const response = await fetch(`/api/events/${eventId}`);
-        if (!response.ok) throw new Error('Failed to fetch event');
-        const data = await response.json();
-        setEvent(data);
-
-        // Fetch reviews using the new service
         const reviewsData = await getEventReviews(eventId!);
         setReviews(reviewsData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
-  }, [user, navigate, eventId]);
+  }, [eventId]);
 
   const handleAttendEvent = async () => {
     if (!event) return;
 
-    const eventDate = new Date(event.date);
+    const eventDate = new Date(event.eventDate);
     if (eventDate < new Date()) {
       setError('Cannot attend past events.');
       return;
@@ -108,22 +104,14 @@ const EventDetails = () => {
       });
 
       if (!response.ok) {
-        if (response.status === 500) {
-          setError('Server error occurred. Please try again later.');
-        } else {
-          setError('Failed to attend event');
-        }
+        setError('Failed to attend event');
         return;
       }
 
       const updatedEvent = await response.json();
       setEvent(updatedEvent);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
 
@@ -167,15 +155,12 @@ const EventDetails = () => {
         <div className="event-details">
           <h3>{event.title}</h3>
           <p>{event.description}</p>
-          <p>Date: {event.date}</p>
-          <p>Time: {event.startTime} - {event.endTime}</p>
+          <p>Date: {event.eventDate}</p>
           <p>Location: {event.location}</p>
           <button onClick={handleAttendEvent}>Attend Event</button>
         </div>
         <div className="reviews-section">
           <h2>Reviews</h2>
-          
-          {/* Add Review Form */}
           <form onSubmit={handleSubmitReview} className="review-form">
             <h3>Write a Review</h3>
             <div className="form-group">
@@ -193,7 +178,6 @@ const EventDetails = () => {
                 ))}
               </select>
             </div>
-            
             <div className="form-group">
               <label htmlFor="comment">Comment:</label>
               <textarea
@@ -206,10 +190,8 @@ const EventDetails = () => {
                 required
               />
             </div>
-            
             <button type="submit">Submit Review</button>
           </form>
-
           {reviews.length > 0 ? (
             reviews.map(review => (
               <div key={review.id} className="review">

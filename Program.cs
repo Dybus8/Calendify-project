@@ -38,6 +38,19 @@ namespace StarterKit
             builder.Services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Add cookie authentication
+            builder.Services.AddAuthentication("Cookies")
+                .AddCookie("Cookies", options =>
+                {
+                    options.LoginPath = "/Login"; // Set your login path
+                    options.AccessDeniedPath = "/AccessDenied"; // Set your access denied path
+                });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+            });
+
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -56,6 +69,7 @@ namespace StarterKit
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthentication(); // Add this line
             app.UseAuthorization();
             app.UseSession();
 

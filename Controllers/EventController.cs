@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarterKit.Models;
 using StarterKit.Models.DTOs;
@@ -42,7 +41,6 @@ namespace StarterKit.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<EventDTO>> CreateEvent([FromBody] EventCreateDTO eventCreateDto)
         {
@@ -58,7 +56,6 @@ namespace StarterKit.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPut("{eventId}")]
         public async Task<ActionResult<EventDTO>> UpdateEvent(int eventId, [FromBody] EventUpdateDTO eventUpdateDto)
         {
@@ -74,7 +71,6 @@ namespace StarterKit.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpDelete("{eventId}")]
         public async Task<IActionResult> DeleteEvent(int eventId)
         {
@@ -90,7 +86,6 @@ namespace StarterKit.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost("{eventId}/attend")]
         public async Task<ActionResult<EventDTO>> AttendEvent(int eventId)
         {

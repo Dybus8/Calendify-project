@@ -15,5 +15,6 @@ namespace StarterKit.Models.DTOs
         public int Points { get; set; }
         public List<ReviewDTO>? Reviews { get; set; }
         public List<AttendeeDTO>? Attendees { get; set; }
+        public bool AdminApproval { get; set; }
     }
 }

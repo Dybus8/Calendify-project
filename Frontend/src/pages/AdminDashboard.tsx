@@ -32,11 +32,6 @@ const AdminDashboard = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || !user.isAdmin) {
-      navigate('/login');
-      return;
-    }
-
     const fetchEvents = async () => {
       try {
         const response = await fetch('/api/events');
@@ -57,9 +52,10 @@ const AdminDashboard = () => {
     };
 
     fetchEvents();
-  }, [user, navigate]);
+  }, []);
 
   const handleCreateEvent = async (eventData: EventFormData) => {
+    console.log("Creating event with data:", eventData); // Log the event data
     try {
       const response = await fetch('/api/events', {
         method: 'POST',

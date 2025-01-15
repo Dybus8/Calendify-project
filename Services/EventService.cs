@@ -56,20 +56,34 @@ namespace StarterKit.Services
 
         public async Task<EventDTO> CreateEventAsync(EventCreateDTO eventCreateDTO)
         {
-            var newEvent = new Event
+            try
             {
-                Title = eventCreateDTO.Title,
-                Description = eventCreateDTO.Description,
-                Location = eventCreateDTO.Location,
-                EventDate = eventCreateDTO.Date,
-                StartTime = eventCreateDTO.StartTime,
-                EndTime = eventCreateDTO.EndTime,
-                Points = eventCreateDTO.Points,
-                Event_Attendances = new List<Event_Attendance>()
-            };
-            _context.Events.Add(newEvent);
-            await _context.SaveChangesAsync();
-            return await GetEventByIdAsync(newEvent.EventId);
+                // Parse the date and time strings
+                DateTime eventDate = DateTime.Parse(eventCreateDTO.Date);
+                TimeSpan startTime = TimeSpan.Parse(eventCreateDTO.StartTime);
+                TimeSpan endTime = TimeSpan.Parse(eventCreateDTO.EndTime);
+
+                var newEvent = new Event
+                {
+                    Title = eventCreateDTO.Title,
+                    Description = eventCreateDTO.Description,
+                    Location = eventCreateDTO.Location,
+                    EventDate = eventDate,
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    Points = eventCreateDTO.Points,
+                    Event_Attendances = new List<Event_Attendance>()
+                };
+
+                _context.Events.Add(newEvent);
+                await _context.SaveChangesAsync();
+                return await GetEventByIdAsync(newEvent.EventId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating event with data: {@EventData}", eventCreateDTO);
+                throw; // Re-throw the exception after logging
+            }
         }
 
         public async Task<EventDTO> UpdateEventAsync(int eventId, EventUpdateDTO eventUpdateDTO)

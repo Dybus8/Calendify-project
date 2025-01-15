@@ -10,6 +10,7 @@ namespace StarterKit.Models
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public int Points { get; set; }
+        public bool AdminApproval { get; set; }
         public virtual ICollection<Event_Attendance> Event_Attendances { get; set; } = new List<Event_Attendance>(); // Initialize
     }
 }
