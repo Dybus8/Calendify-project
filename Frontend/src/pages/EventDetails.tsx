@@ -56,7 +56,23 @@ const EventDetails = () => {
       setAttendees([...attendees, attendeeName]);
 
       // Optionally, send a request to the backend to record attendance
-      await axios.post(`/api/attendance`, { eventId, userId: user.id });
+      const response = await axios.post(`/api/events/${eventId}/attend`, { userId: user.id });
+      
+      if (response.status === 200) {
+          const pointsToAdd = response.data.points; // Assuming the response contains points
+          const userResponse = await axios.get('/api/user');
+
+          if (userResponse.status === 200) {
+              const userData = userResponse.data;
+              const updatedUser = {
+                  ...userData,
+                  points: userData.points + pointsToAdd,
+              };
+
+              // Update user points in the backend
+              await axios.put(`/api/user/update`, updatedUser);
+          }
+      }
     } else {
       alert('You need to be logged in to attend the event.');
     }

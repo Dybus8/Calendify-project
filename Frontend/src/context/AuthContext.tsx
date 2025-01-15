@@ -11,6 +11,7 @@ interface User {
   isAdmin: boolean;
   firstName: string; // Add firstName
   lastName: string;  // Add lastName
+  points: number;    // Add points
 }
 
 interface AuthContextType {
