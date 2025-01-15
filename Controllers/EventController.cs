@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StarterKit.Models;
 using StarterKit.Models.DTOs;
 using StarterKit.Services;
+using Microsoft.Extensions.Logging;
 
 namespace StarterKit.Controllers
 {
@@ -10,10 +12,12 @@ namespace StarterKit.Controllers
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;
+        private readonly ILogger<EventsController> _logger;
 
-        public EventsController(IEventService eventService)
+        public EventsController(IEventService eventService, ILogger<EventsController> logger)
         {
             _eventService = eventService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -33,6 +37,7 @@ namespace StarterKit.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving event with ID {EventId}", eventId);
                 return NotFound(new { message = ex.Message });
             }
         }
@@ -48,6 +53,7 @@ namespace StarterKit.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error creating event");
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -63,6 +69,7 @@ namespace StarterKit.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating event with ID {EventId}", eventId);
                 return NotFound(new { message = ex.Message });
             }
         }
@@ -78,26 +85,8 @@ namespace StarterKit.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting event with ID {EventId}", eventId);
                 return NotFound(new { message = ex.Message });
-            }
-        }
-
-        [Authorize]
-        [HttpPost("{eventId}/reviews")]
-        public async Task<ActionResult<ReviewDTO>> CreateReview(int eventId, [FromBody] ReviewCreateDTO reviewCreateDto)
-        {
-            try
-            {
-                var review = await _eventService.CreateReviewAsync(eventId, reviewCreateDto);
-                return CreatedAtAction(nameof(GetEventById), new { eventId }, review);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -115,77 +104,25 @@ namespace StarterKit.Controllers
                 }
                 var userId = int.Parse(userIdClaim.Value);
 
-                // Check event availability before allowing attendance
-                var isAvailable = await _eventService.CheckEventAvailabilityAsync(eventId, new AttendEventDTO { EventId = eventId });
+                var attendEventDto = new AttendEventDTO { EventId = eventId, UserId = userId };
+
+                var isAvailable = await _eventService.CheckEventAvailabilityAsync(eventId, attendEventDto);
                 if (!isAvailable)
                 {
                     return BadRequest(new { message = "Event is not available for attendance." });
                 }
 
-                var updatedEvent = await _eventService.AttendEventAsync(eventId, userId);
+                var updatedEvent = await _eventService.AttendEventAsync(attendEventDto);
                 return Ok(updatedEvent);
             }
             catch (UnauthorizedAccessException ex)
             {
+                _logger.LogError(ex, "Unauthorized access while attending event with ID {EventId}", eventId);
                 return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [Authorize]
-        [HttpGet("{eventId}/attendees")]
-        public async Task<ActionResult<IEnumerable<AttendeeDTO>>> GetEventAttendees(int eventId)
-        {
-            try
-            {
-                var attendees = await _eventService.GetEventAttendeesAsync(eventId);
-                return Ok(attendees);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-        }
-
-        [Authorize]
-        [HttpDelete("{eventId}/attendance")]
-        public async Task<IActionResult> RemoveEventAttendance(int eventId)
-        {
-            try
-            {
-                var user = HttpContext.User;
-                var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
-                {
-                    return Unauthorized(new { message = "User ID claim not found." });
-                }
-                var userId = int.Parse(userIdClaim.Value);
-                
-                await _eventService.RemoveEventAttendanceAsync(eventId, userId);
-                return Created("", new { message = "Attendance successfully." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        // New endpoint for office attendance management
-        [Authorize]
-        [HttpPost("attendance")]
-        public async Task<IActionResult> ManageOfficeAttendance([FromBody] OfficeAttendanceDTO officeAttendanceDto)
-        {
-            try
-            {
-                // Logic to manage office attendance
-                await _eventService.ManageOfficeAttendanceAsync(officeAttendanceDto);
-                return Ok(new { message = "Attendance recorded successfully." });
-            }
-            catch (Exception ex)
-            {
+                _logger.LogError(ex, "Error attending event with ID {EventId}", eventId);
                 return BadRequest(new { message = ex.Message });
             }
         }

@@ -42,15 +42,12 @@ namespace StarterKit.Controllers
                 case StarterKit.Utils.LoginStatus.Success:
                     _logger.LogInformation("User {Username} logged in successfully", loginDto.Username);
                     return Ok(result);
-                case StarterKit.Utils.LoginStatus.InvalidCredentials:
-                    _logger.LogWarning("Invalid credentials for user: {Username}", loginDto.Username);
-                    return Unauthorized(new { message = "Invalid credentials" });
-                case StarterKit.Utils.LoginStatus.UserNotFound:
-                    _logger.LogWarning("User not found: {Username}", loginDto.Username);
-                    return NotFound(new { message = "User not found" });
                 case StarterKit.Utils.LoginStatus.InvalidPassword:
                     _logger.LogWarning("Invalid password for user: {Username}", loginDto.Username);
                     return Unauthorized(new { message = "Invalid password" });
+                case StarterKit.Utils.LoginStatus.UserNotFound:
+                    _logger.LogWarning("User not found: {Username}", loginDto.Username);
+                    return NotFound(new { message = "User not found" });
                 case StarterKit.Utils.LoginStatus.Unknown:
                 default:
                     _logger.LogError("Unknown error during login for user: {Username}", loginDto.Username);

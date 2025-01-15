@@ -12,12 +12,13 @@ namespace StarterKit.Services
         Task<EventDTO> CreateEventAsync(EventCreateDTO eventCreateDTO);
         Task<EventDTO> UpdateEventAsync(int eventId, EventUpdateDTO eventUpdateDTO);
         Task DeleteEventAsync(int eventId);
-        Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto);
-        Task<EventDTO> AttendEventAsync(int eventId, int userId);
+        Task<UserAccountDTO> GetUserAccountAsync(int userId);
+        Task<UserAccountDTO> UpdateUserAccountAsync(int userId, UserAccountDTO userAccountDTO);
+        Task<EventDTO> AttendEventAsync(AttendEventDTO attendEventDto); // New method added
+        Task<bool> CheckEventAvailabilityAsync(int eventId, AttendEventDTO attendEventDto);
         Task<IEnumerable<AttendeeDTO>> GetEventAttendeesAsync(int eventId);
         Task RemoveEventAttendanceAsync(int eventId, int Id);
-        Task<ReviewDTO> CreateReviewAsync(int eventId, Models.DTOs.ReviewCreateDTO reviewCreateDTO);
-        Task<bool> CheckEventAvailabilityAsync(int eventId, AttendEventDTO attendEventDto);
+        Task<ReviewDTO> CreateReviewAsync(int eventId, ReviewCreateDTO reviewCreateDTO);
         Task ManageOfficeAttendanceAsync(OfficeAttendanceDTO officeAttendanceDto);
     }
 }
