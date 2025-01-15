@@ -23,7 +23,7 @@ const EventDetails = () => {
             }
 
             const id = parseInt(eventId, 10);
-            if (isNaN(id) || id < 1 || id > 10) {
+            if (isNaN(id) || id < 1) {
                 setError('Invalid event ID');
                 return;
             }
@@ -32,7 +32,11 @@ const EventDetails = () => {
                 const response = await axios.get(`/api/events/${id}`);
                 setEventDetails(response.data);
             } catch (err) {
-                setError('Event not found');
+                if (axios.isAxiosError(err) && err.response) {
+                    setError(`Error: ${err.response.data.message || 'Event not found'}`);
+                } else {
+                    setError('An unexpected error occurred');
+                }
             }
         };
 
