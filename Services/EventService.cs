@@ -28,16 +28,31 @@ namespace StarterKit.Services
 
         public async Task<IEnumerable<EventDTO>> GetEventsAsync()
         {
-            return await _context.Events
-                .Select(e => new EventDTO
-                {
-                    Id = e.EventId,
-                    Title = e.Title,
-                    Description = e.Description,
-                    Location = e.Location,
-                    // Other properties...
-                })
-                .ToListAsync();
+            _logger.LogInformation("Fetching all events");
+            try
+            {
+                var events = await _context.Events
+                    .Select(e => new EventDTO
+                    {
+                        Id = e.EventId,
+                        Title = e.Title,
+                        Description = e.Description,
+                        Location = e.Location,
+                        EventDate = e.EventDate,
+                        StartTime = e.StartTime,
+                        EndTime = e.EndTime,
+                        Points = e.Points
+                    })
+                    .ToListAsync();
+
+                _logger.LogInformation("Successfully fetched {Count} events", events.Count());
+                return events;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching events");
+                throw;
+            }
         }
 
         public async Task<EventDTO> GetEventByIdAsync(int eventId)

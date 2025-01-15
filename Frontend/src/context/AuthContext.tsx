@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (userName: string, password: string) => {  // Changed username to userName
     try {
-      console.log('Sending login request with:', { userName, password });
+      console.log('Attempting login for user:', userName);
       const response = await axios.post('http://localhost:3000/api/login', { 
         userName, 
         password 
@@ -38,14 +38,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       });
 
-      console.log('API Response:', response.data);
-      setUser(response.data.user);
-      console.log('Logging in user:', response.data.user);
+      const userData = response.data.user;
+      // Remove password from logged user data
+      const { password: _, ...safeUserData } = userData;
+      
+      console.log('Login successful for:', safeUserData);
+      setUser(userData);
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login failed');
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          console.error('Response data:', error.response.data);
+          console.error('Error:', error.response.data.message || 'Unknown error');
           alert(`Login failed: ${error.response.data.message || 'Internal Server Error'}`);
         } else {
           alert('Login failed: No response from server');
