@@ -8,6 +8,6 @@ namespace StarterKit.Models
         public required UserAccount UserAccount { get; set; } // Updated to UserAccount
         public required Event Event { get; set; }
         public int Id { get; internal set; }
-        public int EventId { get; internal set; }
+        public int EventId { get; set; } // Changed to public
     }
 }

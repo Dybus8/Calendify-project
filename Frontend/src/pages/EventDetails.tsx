@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Custom authentication context
 import { useNavigate, useParams } from 'react-router-dom';
 import './EventDetails.css';
 
@@ -15,13 +15,15 @@ interface Event {
 }
 
 const EventDetails = () => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Get user data from context
   const navigate = useNavigate();
-  const { eventId } = useParams<{ eventId: string }>(); // Ensure eventId is extracted
+  const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attending, setAttending] = useState(false); // Tracks attendance action state
 
+  // Fetch event details
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -29,28 +31,21 @@ const EventDetails = () => {
     }
 
     if (!eventId) {
-      setError('Event ID is missing');
+      setError('Event ID is missing.');
       setLoading(false);
       return;
     }
 
     const fetchEvent = async () => {
       try {
-        console.log(`Fetching event details for event ID: ${eventId}`); // Log event ID
         const response = await fetch(`/api/events/${eventId}`);
         if (!response.ok) {
-          throw new Error(response.statusText);
+          throw new Error('Failed to fetch event details.');
         }
         const data = await response.json();
-        console.log('Event details fetched:', data); // Log fetched event details
         setEvent(data);
       } catch (err) {
-        console.error('Error fetching event details:', err); // Log error
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unknown error occurred');
-        }
+        setError((err as Error).message || 'An unknown error occurred.');
       } finally {
         setLoading(false);
       }
@@ -59,54 +54,45 @@ const EventDetails = () => {
     fetchEvent();
   }, [user, navigate, eventId]);
 
+  // Handle attend event action
   const handleAttendEvent = async () => {
     if (!event) return;
 
-    // Check if the event is in the past
-    const eventDate = new Date(event.date);
-    if (eventDate < new Date()) {
-      setError('Cannot attend past events.');
-      return;
-    }
-
-    // Check if the event is at capacity
-    if (event.attendeesCount >= 100) {
-      setError('This event is at capacity.');
-      return;
-    }
+    setAttending(true); // Start attendance action
+    setError(null); // Clear previous errors
 
     try {
-
-      console.log(`Attending event with ID: ${event.id}`); // Log event ID
-
       const response = await fetch(`/api/events/${event.id}/attend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`, // Include auth token if required
         },
-      }
-    );
+      });
 
       if (!response.ok) {
-        if (response.status === 500) {
-          setError('Server error occurred. Please try again later.');
-        } else {
-          setError('Failed to attend event');
+        if (response.status === 400) {
+          throw new Error('You cannot attend this event.');
         }
-        return;
+        if (response.status === 403) {
+          throw new Error('Unauthorized. Please log in again.');
+        }
+        if (response.status === 500) {
+          throw new Error('Server error. Please try again later.');
+        }
+        throw new Error('Failed to attend event.');
       }
 
       const updatedEvent = await response.json();
-      setEvent(updatedEvent);
+      setEvent(updatedEvent); // Update event state with server response
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+      setError((err as Error).message || 'An unknown error occurred.');
+    } finally {
+      setAttending(false); // End attendance action
     }
   };
 
+  // Render UI
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -116,7 +102,7 @@ const EventDetails = () => {
   }
 
   if (!event) {
-    return <div>Event not found</div>;
+    return <div>Event not found.</div>;
   }
 
   return (
@@ -125,7 +111,7 @@ const EventDetails = () => {
         <button onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
         <button onClick={() => navigate('/logout')}>Logout</button>
       </div>
-      <h1>Event details</h1>
+      <h1>Event Details</h1>
       <div className="event-details-container">
         <div className="event-details">
           <h3>{event.title}</h3>
@@ -133,7 +119,10 @@ const EventDetails = () => {
           <p>Date: {event.date}</p>
           <p>Time: {event.startTime} - {event.endTime}</p>
           <p>Location: {event.location}</p>
-          <button onClick={handleAttendEvent}>Attend Event</button>
+          <p>Attendees: {event.attendeesCount}</p>
+          <button onClick={handleAttendEvent} disabled={attending}>
+            {attending ? 'Processing...' : 'Attend Event'}
+          </button>
         </div>
       </div>
     </div>
